@@ -1,0 +1,182 @@
+[
+  {
+    "name": "Deep Cleaning Service Package",
+    "description": "Comprehensive deep cleaning for your entire home. Includes kitchen deep clean, bathroom sanitization, floor scrubbing, window cleaning, and dusting of all surfaces. Perfect for spring cleaning or moving in/out.",
+    "price": 299.99,
+    "image_url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500",
+    "category": "Cleaning Services",
+    "stock": 50,
+    "featured": true
+  },
+  {
+    "name": "Regular House Cleaning",
+    "description": "Weekly or bi-weekly house cleaning service. Includes vacuuming, mopping, dusting, bathroom cleaning, and kitchen cleanup. Maintain a spotless home with our reliable cleaning professionals.",
+    "price": 149.99,
+    "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500",
+    "category": "Cleaning Services",
+    "stock": 100,
+    "featured": true
+  },
+  {
+    "name": "Carpet & Upholstery Cleaning",
+    "description": "Professional deep cleaning for carpets, rugs, and upholstery. Uses eco-friendly cleaning solutions and advanced equipment to remove stains, odors, and allergens. Restore your furniture to like-new condition.",
+    "price": 199.99,
+    "image_url": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=500",
+    "category": "Cleaning Services",
+    "stock": 75,
+    "featured": false
+  },
+  {
+    "name": "Window Cleaning Service",
+    "description": "Crystal clear windows inside and out. Professional window cleaning for residential properties. Includes window frames, sills, and tracks. Streak-free finish guaranteed.",
+    "price": 89.99,
+    "image_url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=500",
+    "category": "Cleaning Services",
+    "stock": 60,
+    "featured": false
+  },
+  {
+    "name": "Move-In/Move-Out Cleaning",
+    "description": "Complete cleaning service for moving. Ensures your old or new home is spotless. Includes deep cleaning of all rooms, appliances, cabinets, and fixtures. Perfect for landlords and tenants.",
+    "price": 349.99,
+    "image_url": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=500",
+    "category": "Cleaning Services",
+    "stock": 40,
+    "featured": true
+  },
+  {
+    "name": "Office Cleaning Service",
+    "description": "Professional office cleaning to maintain a clean and healthy workspace. Includes desk cleaning, floor maintenance, restroom sanitization, and trash removal. Available daily, weekly, or monthly.",
+    "price": 249.99,
+    "image_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=500",
+    "category": "Commercial Cleaning",
+    "stock": 80,
+    "featured": false
+  },
+  {
+    "name": "Post-Construction Cleanup",
+    "description": "Thorough cleaning after construction or renovation projects. Removes dust, debris, paint splatters, and construction materials. Includes detailed cleaning of all surfaces, fixtures, and appliances.",
+    "price": 399.99,
+    "image_url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500",
+    "category": "Specialty Cleaning",
+    "stock": 30,
+    "featured": false
+  },
+  {
+    "name": "Laundry & Dry Cleaning Service",
+    "description": "Professional laundry and dry cleaning service. Pickup and delivery included. Handles delicate fabrics, suits, dresses, and everyday clothing. Pressed and folded to perfection.",
+    "price": 79.99,
+    "image_url": "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=500",
+    "category": "Laundry Services",
+    "stock": 90,
+    "featured": false
+  },
+  {
+    "name": "HVAC Duct Cleaning",
+    "description": "Professional air duct cleaning to improve indoor air quality. Removes dust, allergens, and debris from your HVAC system. Includes filter replacement and system inspection.",
+    "price": 279.99,
+    "image_url": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500",
+    "category": "Maintenance Services",
+    "stock": 45,
+    "featured": true
+  },
+  {
+    "name": "Gutter Cleaning Service",
+    "description": "Complete gutter cleaning and maintenance. Removes leaves, debris, and blockages. Includes downspout cleaning and inspection. Prevents water damage and maintains proper drainage.",
+    "price": 129.99,
+    "image_url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500",
+    "category": "Exterior Services",
+    "stock": 55,
+    "featured": false
+  },
+  {
+    "name": "Pressure Washing Service",
+    "description": "Professional pressure washing for driveways, patios, decks, and exterior walls. Removes dirt, grime, mold, and stains. Restores surfaces to their original appearance.",
+    "price": 179.99,
+    "image_url": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500",
+    "category": "Exterior Services",
+    "stock": 50,
+    "featured": false
+  },
+  {
+    "name": "Pest Control Service",
+    "description": "Comprehensive pest control treatment for common household pests. Safe and effective solutions for ants, roaches, rodents, and more. Includes initial treatment and follow-up visits.",
+    "price": 149.99,
+    "image_url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500",
+    "category": "Maintenance Services",
+    "stock": 70,
+    "featured": true
+  },
+  {
+    "name": "Plumbing Maintenance Package",
+    "description": "Regular plumbing maintenance to prevent costly repairs. Includes inspection, drain cleaning, leak detection, and minor repairs. Keeps your plumbing system running smoothly.",
+    "price": 199.99,
+    "image_url": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=500",
+    "category": "Maintenance Services",
+    "stock": 65,
+    "featured": false
+  },
+  {
+    "name": "Electrical Safety Inspection",
+    "description": "Professional electrical safety inspection for your home. Identifies potential hazards, checks wiring, outlets, and circuit breakers. Ensures your home meets safety standards.",
+    "price": 159.99,
+    "image_url": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=500",
+    "category": "Maintenance Services",
+    "stock": 40,
+    "featured": false
+  },
+  {
+    "name": "Yard Maintenance Service",
+    "description": "Regular lawn care and yard maintenance. Includes mowing, edging, trimming, leaf removal, and basic landscaping. Keep your yard looking beautiful year-round.",
+    "price": 119.99,
+    "image_url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500",
+    "category": "Landscaping",
+    "stock": 85,
+    "featured": false
+  },
+  {
+    "name": "Appliance Repair Service",
+    "description": "Expert repair service for major appliances. Covers refrigerators, dishwashers, washing machines, dryers, and ovens. Same-day service available. Warranty included on all repairs.",
+    "price": 99.99,
+    "image_url": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=500",
+    "category": "Repair Services",
+    "stock": 60,
+    "featured": true
+  },
+  {
+    "name": "Handyman Service Package",
+    "description": "Multi-service handyman package for various home repairs and improvements. Includes furniture assembly, picture hanging, minor repairs, and general maintenance tasks.",
+    "price": 149.99,
+    "image_url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500",
+    "category": "Repair Services",
+    "stock": 75,
+    "featured": false
+  },
+  {
+    "name": "Home Organization Service",
+    "description": "Professional home organization and decluttering service. Helps organize closets, kitchens, garages, and storage areas. Creates efficient systems for maintaining order.",
+    "price": 199.99,
+    "image_url": "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=500",
+    "category": "Organization Services",
+    "stock": 50,
+    "featured": false
+  },
+  {
+    "name": "Pet Care Service Package",
+    "description": "Comprehensive pet care services including pet sitting, dog walking, and pet grooming. Experienced and loving care for your furry family members.",
+    "price": 89.99,
+    "image_url": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=500",
+    "category": "Pet Services",
+    "stock": 90,
+    "featured": false
+  },
+  {
+    "name": "Senior Home Care Assistance",
+    "description": "Compassionate home care assistance for seniors. Includes light housekeeping, meal preparation, companionship, and medication reminders. Helps seniors maintain independence.",
+    "price": 249.99,
+    "image_url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500",
+    "category": "Care Services",
+    "stock": 35,
+    "featured": true
+  }
+]

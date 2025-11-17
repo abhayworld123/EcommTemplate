@@ -1,0 +1,14 @@
+{
+  "id": "1",
+  "site_name": "HomeServic Pro",
+  "banner_image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200",
+  "description": "Premium household services for your home",
+  "theme_color": "#2563eb",
+  "contact_email": "info@homeservicespro.com",
+  "contact_phone": "+1 (234) 567-890",
+  "contact_address": "123 Commerce Street, Business District, City, State 12345",
+  "social_media_facebook": "https://facebook.com/homeservicespro",
+  "social_media_twitter": "https://twitter.com/homeservicespro",
+  "social_media_instagram": "https://instagram.com/homeservicespro",
+  "social_media_linkedin": "https://linkedin.com/company/homeservicespro"
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "offerId": "OFF001",
+    "title": "Winter Sale - 50% Off",
+    "description": "Get up to 50% off on all winter wear. Limited time only!",
+    "imageUrl": "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1200",
+    "ctaText": "Shop Now",
+    "ctaLink": "/products",
+    "discount": 50,
+    "bgGradient": "from-blue-500 to-purple-600"
+  },
+  {
+    "offerId": "OFF002",
+    "title": "New Arrivals: Summer Collection",
+    "description": "Explore our fresh summer styles and stay trendy this season.",
+    "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200",
+    "ctaText": "Explore Collection",
+    "ctaLink": "/products",
+    "discount": 30,
+    "bgGradient": "from-pink-500 to-rose-600"
+  },
+  {
+    "offerId": "OFF003",
+    "title": "Exclusive App Offer",
+    "description": "Download our app and get an extra 10% off on your first order.",
+    "imageUrl": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200",
+    "ctaText": "Download App",
+    "ctaLink": "/products",
+    "discount": 10,
+    "bgGradient": "from-green-500 to-emerald-600"
+  },
+  {
+    "offerId": "OFF004",
+    "title": "Buy 1 Get 1 Free",
+    "description": "Don't miss our special offer on select accessories.",
+    "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
+    "ctaText": "Grab Offer",
+    "ctaLink": "/products",
+    "discount": 0,
+    "bgGradient": "from-orange-500 to-red-600"
+  },
+  {
+    "offerId": "OFF005",
+    "title": "Weekend Flash Deal",
+    "description": "Hurry! Extra 20% off on electronics till Sunday midnight.",
+    "imageUrl": "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1200",
+    "ctaText": "Shop Deals",
+    "ctaLink": "/products",
+    "discount": 20,
+    "bgGradient": "from-indigo-500 to-blue-600"
+  }
+]
+
+
+
+

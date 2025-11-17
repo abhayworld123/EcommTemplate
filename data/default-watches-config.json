@@ -1,0 +1,14 @@
+{
+  "id": "1",
+  "site_name": "Timepiece Collection",
+  "banner_image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
+  "description": "Premium timepieces for every occasion",
+  "theme_color": "#7c3aed",
+  "contact_email": "info@timepiececollection.com",
+  "contact_phone": "+1 (234) 567-891",
+  "contact_address": "456 Watchmaker Avenue, Luxury District, City, State 12345",
+  "social_media_facebook": "https://facebook.com/timepiececollection",
+  "social_media_twitter": "https://twitter.com/timepiececollection",
+  "social_media_instagram": "https://instagram.com/timepiececollection",
+  "social_media_linkedin": "https://linkedin.com/company/timepiececollection"
+}

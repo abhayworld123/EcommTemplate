@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Classic Leather Watch",
+    "description": "Timeless elegance meets modern craftsmanship. This classic leather watch features a genuine leather strap and precision quartz movement.",
+    "price": 299.99,
+    "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
+    "category": "Men",
+    "stock": 50,
+    "featured": true
+  },
+  {
+    "name": "Sport Digital Watch",
+    "description": "Perfect for active lifestyles. Water-resistant, shock-resistant, and packed with features including stopwatch, timer, and backlight.",
+    "price": 149.99,
+    "image_url": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=500",
+    "category": "Men",
+    "stock": 75,
+    "featured": true
+  },
+  {
+    "name": "Elegant Rose Gold Watch",
+    "description": "Sophisticated rose gold finish with a delicate design. Perfect for special occasions and everyday elegance.",
+    "price": 399.99,
+    "image_url": "https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=500",
+    "category": "Women",
+    "stock": 40,
+    "featured": true
+  },
+  {
+    "name": "Minimalist Silver Watch",
+    "description": "Clean, minimalist design with a silver case and mesh band. Ideal for those who appreciate simplicity and style.",
+    "price": 249.99,
+    "image_url": "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=500",
+    "category": "Women",
+    "stock": 60,
+    "featured": false
+  },
+  {
+    "name": "Luxury Chronograph Watch",
+    "description": "High-end chronograph with multiple sub-dials, tachymeter bezel, and premium materials. A statement piece for watch enthusiasts.",
+    "price": 899.99,
+    "image_url": "https://images.unsplash.com/photo-1539874754764-5a96559165b0?w=500",
+    "category": "Men",
+    "stock": 25,
+    "featured": true
+  },
+  {
+    "name": "Smart Fitness Watch",
+    "description": "Track your health and fitness with this advanced smartwatch. Heart rate monitor, GPS, and smartphone connectivity included.",
+    "price": 199.99,
+    "image_url": "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=500",
+    "category": "Unisex",
+    "stock": 100,
+    "featured": true
+  },
+  {
+    "name": "Vintage Pocket Watch",
+    "description": "A beautiful reproduction of a classic pocket watch. Perfect for collectors and those who appreciate vintage style.",
+    "price": 349.99,
+    "image_url": "https://images.unsplash.com/photo-1526045431048-f857369baa09?w=500",
+    "category": "Men",
+    "stock": 15,
+    "featured": false
+  },
+  {
+    "name": "Diamond Accent Watch",
+    "description": "Luxurious watch with diamond accents on the bezel. A stunning piece that combines elegance with precision timekeeping.",
+    "price": 1299.99,
+    "image_url": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=500",
+    "category": "Women",
+    "stock": 10,
+    "featured": true
+  },
+  {
+    "name": "Diver's Professional Watch",
+    "description": "Professional-grade dive watch with 200m water resistance, rotating bezel, and luminous markers. Built for adventure.",
+    "price": 449.99,
+    "image_url": "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?w=500",
+    "category": "Men",
+    "stock": 30,
+    "featured": false
+  },
+  {
+    "name": "Fashion Statement Watch",
+    "description": "Bold design with unique color combinations. Make a statement with this eye-catching timepiece.",
+    "price": 179.99,
+    "image_url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=500",
+    "category": "Women",
+    "stock": 55,
+    "featured": false
+  }
+]
