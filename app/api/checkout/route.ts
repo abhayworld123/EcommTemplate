@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase-server';
 import { getCurrentUser } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,15 +14,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No items in cart' }, { status: 400 });
     }
 
+    // Check if Stripe is configured
+    let stripe;
+    try {
+      stripe = getStripe();
+    } catch (error) {
+      console.error('Stripe configuration error:', error);
+      return NextResponse.json(
+        { error: 'Payment processing is not configured. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
     const supabase = await createServerClient();
     const user = await getCurrentUser(); // Get authenticated user if available
 
     // Fetch product names for better Stripe display
     const productIds = items.map((item: any) => item.product_id);
-    const { data: products } = await supabase
+    const { data: products, error: productsError } = await supabase
       .from('products')
       .select('id, name')
       .in('id', productIds);
+
+    if (productsError) {
+      console.error('Error fetching products:', productsError);
+      return NextResponse.json(
+        { error: 'Failed to fetch product information' },
+        { status: 500 }
+      );
+    }
 
     const productMap = new Map(
       (products || []).map((p: any) => [p.id, p.name])
@@ -33,23 +55,32 @@ export async function POST(request: NextRequest) {
     );
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: items.map((item: any) => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: productMap.get(item.product_id) || `Product ${item.product_id}`,
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: items.map((item: any) => ({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: productMap.get(item.product_id) || `Product ${item.product_id}`,
+            },
+            unit_amount: Math.round(item.price * 100),
           },
-          unit_amount: Math.round(item.price * 100),
-        },
-        quantity: item.quantity,
-      })),
-      mode: 'payment',
-      success_url: `${request.nextUrl.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.nextUrl.origin}/checkout`,
-      customer_email: customer.email,
-    });
+          quantity: item.quantity,
+        })),
+        mode: 'payment',
+        success_url: `${request.nextUrl.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${request.nextUrl.origin}/checkout`,
+        customer_email: customer.email,
+      });
+    } catch (stripeError: any) {
+      console.error('Stripe session creation error:', stripeError);
+      return NextResponse.json(
+        { error: stripeError?.message || 'Failed to create payment session' },
+        { status: 500 }
+      );
+    }
 
     // Create order in database (link to user if authenticated)  
     const { data: order, error: orderError } = await supabase
@@ -86,11 +117,15 @@ export async function POST(request: NextRequest) {
       console.error('Order items creation error:', itemsError);
     }
 
-    return NextResponse.json({ sessionId: session.id });
-  } catch (error) {
+    return NextResponse.json({ 
+      sessionId: session.id,
+      url: session.url 
+    });
+  } catch (error: any) {
     console.error('Checkout error:', error);
+    const errorMessage = error?.message || 'Failed to process checkout';
     return NextResponse.json(
-      { error: 'Failed to process checkout' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

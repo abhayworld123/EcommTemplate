@@ -1,4 +1,4 @@
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase-server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,6 +11,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Get Stripe instance
+    const stripe = getStripe();
+    
     // Verify session with Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 

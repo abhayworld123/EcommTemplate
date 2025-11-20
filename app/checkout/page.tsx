@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { formatPrice } from '@/lib/utils';
@@ -22,14 +22,21 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CheckoutFormData>();
 
-  if (items.length === 0) {
-    router.push('/cart');
+  useEffect(() => {
+    setMounted(true);
+    if (items.length === 0) {
+      router.push('/cart');
+    }
+  }, [items.length, router]);
+
+  if (!mounted || items.length === 0) {
     return null;
   }
 
@@ -51,22 +58,23 @@ export default function CheckoutPage() {
 
       const result = await response.json();
       
-      if (result.error) {
-        alert(result.error);
+      if (!response.ok || result.error) {
+        alert(result.error || 'Failed to process checkout. Please try again.');
+        setLoading(false);
         return;
       }
 
-      if (result.sessionId) {
-        const { loadStripe } = await import('@stripe/stripe-js');
-        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
-        if (stripe) {
-          await (stripe as any).redirectToCheckout({ sessionId: result.sessionId });
-        }
+      if (result.sessionId && result.url) {
+        // Redirect directly to Stripe Checkout URL
+        window.location.href = result.url;
+        // Note: We don't set loading to false here as the page will redirect
+      } else {
+        alert('No checkout session received. Please try again.');
+        setLoading(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Checkout error:', error);
-      alert('Failed to process checkout. Please try again.');
-    } finally {
+      alert(error?.message || 'Failed to process checkout. Please try again.');
       setLoading(false);
     }
   };
