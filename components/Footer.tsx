@@ -32,7 +32,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* About Section */}
           <div className="lg:col-span-1">
-            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
               About Us
             </h3>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
@@ -45,7 +45,7 @@ export default function Footer() {
 
           {/* Quick Links Section */}
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
               Quick Links
             </h3>
             <ul className="space-y-2">
@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* Contact Info Section */}
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
               Contact Info
             </h3>
             <ul className="space-y-3">
@@ -116,7 +116,7 @@ export default function Footer() {
 
           {/* Social Media Section */}
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <h3 className="text-white text-lg font-semibold mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
               Follow Us
             </h3>
             <p className="text-sm text-gray-400 mb-4">

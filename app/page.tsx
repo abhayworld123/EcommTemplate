@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { createServerClient } from '@/lib/supabase-server';
 import ProductList from '@/components/ProductList';
 import OffersCarousel from '@/components/OffersCarousel';
+import BackgroundImageSlider from '@/components/BackgroundImageSlider';
+import ProductSliders from '@/components/ProductSliders';
 import { Product } from '@/types';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
@@ -59,15 +61,34 @@ async function getSiteConfig() {
   return data;
 }
 
+async function getSliderConfig() {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase
+    .from('slider_config')
+    .select('*')
+    .single();
+  
+  if (error || !data) {
+    return {
+      id: '1',
+      images: [],
+      autoplay: false,
+    };
+  }
+  
+  return data;
+}
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
   const featuredProducts = await getFeaturedProducts();
   const config = await getSiteConfig();
+  const sliderConfig = await getSliderConfig();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen">
       {/* Premium Hero Banner */}
       <div className="relative h-[600px] md:h-[700px] w-full overflow-hidden">
         {/* Background Image with Gradient Overlay */}
@@ -94,7 +115,7 @@ export default async function Home() {
             </div>
             <h1 
               className="mb-6 text-5xl md:text-7xl font-bold leading-tight"
-              style={{ fontFamily: 'var(--font-playfair)' }}
+              style={{ fontFamily: 'var(--font-roboto)' }}
             >
               {config.site_name}
             </h1>
@@ -130,6 +151,19 @@ export default async function Home() {
       {/* Offers Carousel */}
       <OffersCarousel />
 
+      {/* Background Image Slider */}
+      {sliderConfig.images && 
+       Array.isArray(sliderConfig.images) && 
+       sliderConfig.images.length > 0 && (
+        <BackgroundImageSlider 
+          images={sliderConfig.images} 
+          autoplay={sliderConfig.autoplay || false}
+        />
+      )}
+
+      {/* Configurable Product Sliders */}
+      <ProductSliders />
+
       {/* Featured Products Section */}
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
@@ -140,12 +174,12 @@ export default async function Home() {
           </div>
           <h2 
             className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
-            style={{ fontFamily: 'var(--font-playfair)' }}
+            style={{ fontFamily: 'var(--font-roboto)' }}
           >
             Featured Products
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover our handpicked selection of premium timepieces
+            {config.description}
           </p>
         </div>
         {featuredProducts.length > 0 ? (

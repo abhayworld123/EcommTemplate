@@ -56,7 +56,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             )}
             <h1 
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
-              style={{ fontFamily: 'var(--font-playfair)' }}
+              style={{ fontFamily: 'var(--font-roboto)' }}
             >
               {product.name}
             </h1>
