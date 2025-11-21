@@ -5,18 +5,29 @@ import { Filter } from 'lucide-react';
 
 async function getProducts(category?: string): Promise<Product[]> {
   const supabase = await createServerClient();
-  let query = supabase.from('products').select('*');
   
-  if (category) {
-    query = query.eq('category', category);
-  }
-  
-  const { data, error } = await query.order('created_at', { ascending: false });
+  // Always fetch all products first, then filter client-side for case-insensitive matching
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
   
   if (error || !data) {
     return [];
   }
-  return data as Product[];
+  
+  // If no category filter, return all products
+  if (!category || !category.trim()) {
+    return data as Product[];
+  }
+  
+  // Filter by category (case-insensitive)
+  const decodedCategory = decodeURIComponent(category).trim().toLowerCase();
+  const filtered = data.filter((p: any) => 
+    p.category?.toLowerCase().trim() === decodedCategory
+  ) as Product[];
+  
+  return filtered;
 }
 
 async function getCategories(): Promise<string[]> {
@@ -34,9 +45,11 @@ async function getCategories(): Promise<string[]> {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: { category?: string };
+  searchParams: Promise<{ category?: string }>;
 }) {
-  const products = await getProducts(searchParams.category);
+  const params = await searchParams;
+  const category = params.category;
+  const products = await getProducts(category);
   const categories = await getCategories();
 
   return (
@@ -45,7 +58,7 @@ export default async function ProductsPage({
         <div className="mb-12">
           <h1 
             className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
-            style={{ fontFamily: 'var(--font-playfair)' }}
+            style={{ fontFamily: 'var(--font-roboto)' }}
           >
             All Products
           </h1>
@@ -61,26 +74,32 @@ export default async function ProductsPage({
           <a
             href="/products"
             className={`px-6 py-2 rounded-xl font-medium transition-all duration-200 ${
-              !searchParams.category
+              !category
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             All
           </a>
-          {categories.map((cat) => (
-            <a
-              key={cat}
-              href={`/products?category=${encodeURIComponent(cat)}`}
-              className={`px-6 py-2 rounded-xl font-medium transition-all duration-200 ${
-                searchParams.category === cat
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              {cat}
-            </a>
-          ))}
+          {categories.map((cat) => {
+            // Normalize both for comparison (case-insensitive)
+            const normalizedCategory = category ? decodeURIComponent(category).trim().toLowerCase() : '';
+            const normalizedCat = cat.trim().toLowerCase();
+            const isActive = normalizedCategory === normalizedCat;
+            return (
+              <a
+                key={cat}
+                href={`/products?category=${encodeURIComponent(cat)}`}
+                className={`px-6 py-2 rounded-xl font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                {cat}
+              </a>
+            );
+          })}
         </div>
 
         <ProductList products={products} />

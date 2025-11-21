@@ -53,6 +53,39 @@ export interface SiteConfig {
   };
 }
 
+export interface SliderConfig {
+  id: string;
+  images: string[];
+  autoplay: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface NavigationItem {
+  label: string;
+  href: string;
+}
+
+export interface HeaderConfig {
+  id: string;
+  style: 'default' | 'centered' | 'minimal' | 'modern' | 'classic';
+  background_color: string;
+  text_color: string;
+  hover_color: string;
+  accent_color: string;
+  logo_url?: string;
+  logo_text?: string;
+  sticky: boolean;
+  transparent_on_top: boolean;
+  navigation_items: NavigationItem[];
+  show_search: boolean;
+  show_cart: boolean;
+  show_user_menu: boolean;
+  height: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ExcelProductRow {
   name: string;
   description: string;
@@ -83,5 +116,35 @@ export interface User {
   id: string;
   email: string;
   created_at?: string;
+}
+
+export interface ProductSliderConfig {
+  id: string;
+  title: string;
+  type: 'all' | 'category' | 'featured' | 'newest';
+  category?: string;
+  limit_count: number;
+  display_order: number;
+  show_title: boolean;
+  auto_scroll: boolean;
+  scroll_speed: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface BackgroundConfig {
+  id: string;
+  type: 'gradient' | 'mesh' | 'particles' | 'grid';
+  primary_color: string;
+  secondary_color: string;
+  tertiary_color: string;
+  speed: number;
+  direction: string;
+  opacity: number;
+  blur: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 

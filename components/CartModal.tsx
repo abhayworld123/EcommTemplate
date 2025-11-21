@@ -49,7 +49,7 @@ export default function CartModal() {
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-gradient-to-r from-blue-50 to-purple-50">
               <div className="flex items-center gap-3">
                 <ShoppingCart className="w-6 h-6 text-blue-600" />
-                <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-playfair)' }}>
+                <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-roboto)' }}>
                   Shopping Cart
                 </h2>
               </div>
@@ -71,7 +71,7 @@ export default function CartModal() {
                   <div className="inline-block p-6 bg-gray-100 rounded-full mb-6">
                     <ShoppingCart className="w-16 h-16 text-gray-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-playfair)' }}>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-roboto)' }}>
                     Your Cart is Empty
                   </h3>
                   <p className="text-gray-600 mb-6">Start adding some products to your cart!</p>
