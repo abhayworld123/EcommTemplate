@@ -343,7 +343,14 @@ export default function ConfigEditorPage() {
       }
 
       const data = await res.json();
-      setOffers([...offers, data]);
+      // Refresh offers list from server to ensure consistency
+      const offersRes = await fetch('/api/offers?active=false');
+      if (offersRes.ok) {
+        const offersData = await offersRes.json();
+        setOffers(offersData || []);
+      } else {
+        setOffers([...offers, data]);
+      }
       setNewOffer({
         offer_id: '',
         title: '',
@@ -389,7 +396,14 @@ export default function ConfigEditorPage() {
       }
 
       const data = await res.json();
-      setOffers(offers.map((o) => (o.id === editingOffer.id ? data : o)));
+      // Refresh offers list from server to ensure consistency
+      const offersRes = await fetch('/api/offers?active=false');
+      if (offersRes.ok) {
+        const offersData = await offersRes.json();
+        setOffers(offersData || []);
+      } else {
+        setOffers(offers.map((o) => (o.id === editingOffer.id ? data : o)));
+      }
       setEditingOffer(null);
       setMessage({ type: 'success', text: 'Offer updated successfully!' });
       setTimeout(() => setMessage(null), 3000);
@@ -420,7 +434,14 @@ export default function ConfigEditorPage() {
         throw new Error(errorData.error || 'Failed to delete offer');
       }
 
-      setOffers(offers.filter((o) => o.id !== id));
+      // Refresh offers list from server to ensure consistency
+      const offersRes = await fetch('/api/offers?active=false');
+      if (offersRes.ok) {
+        const offersData = await offersRes.json();
+        setOffers(offersData || []);
+      } else {
+        setOffers(offers.filter((o) => o.id !== id));
+      }
       setMessage({ type: 'success', text: 'Offer deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -459,7 +480,14 @@ export default function ConfigEditorPage() {
       }
 
       const data = await res.json();
-      setProducts([...products, data]);
+      // Refresh products list from server to ensure consistency
+      const productsRes = await fetch('/api/products');
+      if (productsRes.ok) {
+        const productsData = await productsRes.json();
+        setProducts(productsData || []);
+      } else {
+        setProducts([...products, data]);
+      }
       setNewProduct({
         name: '',
         description: '',
@@ -502,7 +530,14 @@ export default function ConfigEditorPage() {
       }
 
       const data = await res.json();
-      setProducts(products.map((p) => (p.id === editingProduct.id ? data : p)));
+      // Refresh products list from server to ensure consistency
+      const productsRes = await fetch('/api/products');
+      if (productsRes.ok) {
+        const productsData = await productsRes.json();
+        setProducts(productsData || []);
+      } else {
+        setProducts(products.map((p) => (p.id === editingProduct.id ? data : p)));
+      }
       setEditingProduct(null);
       setMessage({ type: 'success', text: 'Product updated successfully!' });
       setTimeout(() => setMessage(null), 3000);
@@ -533,7 +568,14 @@ export default function ConfigEditorPage() {
         throw new Error(errorData.error || 'Failed to delete product');
       }
 
-      setProducts(products.filter((p) => p.id !== id));
+      // Refresh products list from server to ensure consistency
+      const productsRes = await fetch('/api/products');
+      if (productsRes.ok) {
+        const productsData = await productsRes.json();
+        setProducts(productsData || []);
+      } else {
+        setProducts(products.filter((p) => p.id !== id));
+      }
       setMessage({ type: 'success', text: 'Product deleted successfully!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -1135,34 +1177,57 @@ export default function ConfigEditorPage() {
                       Add Item
                     </button>
                   </div>
-                  <div className="space-y-2">
-                    {headerConfig.navigation_items.map((item, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={item.label}
-                          onChange={(e) => updateNavigationItem(index, 'label', e.target.value)}
-                          placeholder="Label"
-                          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          value={item.href}
-                          onChange={(e) => updateNavigationItem(index, 'href', e.target.value)}
-                          placeholder="/path"
-                          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
-                        <button
-                          onClick={() => removeNavigationItem(index)}
-                          className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                    {headerConfig.navigation_items.length === 0 && (
-                      <p className="text-sm text-gray-500 py-2">No navigation items. Click "Add Item" to add one.</p>
-                    )}
+                  <div className="overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Label</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">URL</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500 w-20">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 bg-white">
+                        {headerConfig.navigation_items.length === 0 ? (
+                          <tr>
+                            <td colSpan={3} className="px-4 py-4 text-center text-sm text-gray-500">
+                              No navigation items. Click "Add Item" to add one.
+                            </td>
+                          </tr>
+                        ) : (
+                          headerConfig.navigation_items.map((item, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="px-4 py-2">
+                                <input
+                                  type="text"
+                                  value={item.label}
+                                  onChange={(e) => updateNavigationItem(index, 'label', e.target.value)}
+                                  placeholder="Label"
+                                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <input
+                                  type="text"
+                                  value={item.href}
+                                  onChange={(e) => updateNavigationItem(index, 'href', e.target.value)}
+                                  placeholder="/path"
+                                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <button
+                                  onClick={() => removeNavigationItem(index)}
+                                  className="rounded-lg border border-red-300 bg-red-50 p-2 text-red-600 hover:bg-red-100"
+                                  title="Remove"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -1886,28 +1951,47 @@ export default function ConfigEditorPage() {
                       Add Image
                     </button>
                   </div>
-                  <div className="space-y-2">
-                    {sliderConfig.images.length === 0 ? (
-                      <p className="text-sm text-gray-500 py-2">No images added. Click "Add Image" to add one.</p>
-                    ) : (
-                      sliderConfig.images.map((imageUrl, index) => (
-                        <div key={index} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={imageUrl}
-                            onChange={(e) => updateSliderImage(index, e.target.value)}
-                            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            placeholder="https://example.com/image.jpg"
-                          />
-                          <button
-                            onClick={() => removeSliderImage(index)}
-                            className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))
-                    )}
+                  <div className="overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Image URL</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500 w-20">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 bg-white">
+                        {sliderConfig.images.length === 0 ? (
+                          <tr>
+                            <td colSpan={2} className="px-4 py-4 text-center text-sm text-gray-500">
+                              No images added. Click "Add Image" to add one.
+                            </td>
+                          </tr>
+                        ) : (
+                          sliderConfig.images.map((imageUrl, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="px-4 py-2">
+                                <input
+                                  type="text"
+                                  value={imageUrl}
+                                  onChange={(e) => updateSliderImage(index, e.target.value)}
+                                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                  placeholder="https://example.com/image.jpg"
+                                />
+                              </td>
+                              <td className="px-4 py-2">
+                                <button
+                                  onClick={() => removeSliderImage(index)}
+                                  className="rounded-lg border border-red-300 bg-red-50 p-2 text-red-600 hover:bg-red-100"
+                                  title="Remove"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                   {sliderConfig.images.length >= 10 && (
                     <p className="mt-2 text-xs text-orange-600">Maximum 10 images reached</p>

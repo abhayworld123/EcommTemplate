@@ -3,6 +3,10 @@ import ProductList from '@/components/ProductList';
 import { Product } from '@/types';
 import { Filter } from 'lucide-react';
 
+// Force dynamic rendering to ensure searchParams are always fresh
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getProducts(category?: string): Promise<Product[]> {
   const supabase = await createServerClient();
   
@@ -21,11 +25,32 @@ async function getProducts(category?: string): Promise<Product[]> {
     return data as Product[];
   }
   
-  // Filter by category (case-insensitive)
-  const decodedCategory = decodeURIComponent(category).trim().toLowerCase();
-  const filtered = data.filter((p: any) => 
-    p.category?.toLowerCase().trim() === decodedCategory
-  ) as Product[];
+  // Decode and normalize the category parameter
+  let decodedCategory: string;
+  try {
+    decodedCategory = decodeURIComponent(category).trim();
+  } catch {
+    decodedCategory = category.trim();
+  }
+  
+  // Normalize for comparison (case-insensitive, trim whitespace)
+  const normalizedSearchCategory = decodedCategory.toLowerCase().replace(/\s+/g, ' ');
+  
+  // Filter by category (case-insensitive, handles whitespace variations)
+  const filtered = data.filter((p: any) => {
+    if (!p.category) return false;
+    const normalizedProductCategory = p.category.toLowerCase().trim().replace(/\s+/g, ' ');
+    const matches = normalizedProductCategory === normalizedSearchCategory;
+    return matches;
+  }) as Product[];
+  
+  // Debug logging
+  console.log('Filtering - Search category:', normalizedSearchCategory);
+  console.log('Filtering - Total products:', data.length);
+  console.log('Filtering - Filtered products:', filtered.length);
+  if (filtered.length === 0 && data.length > 0) {
+    console.log('Filtering - Sample product categories:', data.slice(0, 5).map((p: any) => p.category));
+  }
   
   return filtered;
 }
@@ -48,9 +73,17 @@ export default async function ProductsPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const params = await searchParams;
-  const category = params.category;
+  const category = params?.category;
+  
+  // Debug logging (remove in production)
+  console.log('Products Page - Category from URL:', category);
+  
   const products = await getProducts(category);
   const categories = await getCategories();
+  
+  // Debug logging
+  console.log('Products Page - Filtered products count:', products.length);
+  console.log('Products Page - Available categories:', categories);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-32 pb-12">
@@ -74,7 +107,7 @@ export default async function ProductsPage({
           <a
             href="/products"
             className={`px-6 py-2 rounded-xl font-medium transition-all duration-200 ${
-              !category
+              !category || category === ''
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
@@ -82,9 +115,16 @@ export default async function ProductsPage({
             All
           </a>
           {categories.map((cat) => {
-            // Normalize both for comparison (case-insensitive)
-            const normalizedCategory = category ? decodeURIComponent(category).trim().toLowerCase() : '';
-            const normalizedCat = cat.trim().toLowerCase();
+            // Normalize both for comparison (case-insensitive, handle whitespace)
+            let normalizedCategory = '';
+            if (category) {
+              try {
+                normalizedCategory = decodeURIComponent(category).trim().toLowerCase().replace(/\s+/g, ' ');
+              } catch {
+                normalizedCategory = category.trim().toLowerCase().replace(/\s+/g, ' ');
+              }
+            }
+            const normalizedCat = cat.trim().toLowerCase().replace(/\s+/g, ' ');
             const isActive = normalizedCategory === normalizedCat;
             return (
               <a

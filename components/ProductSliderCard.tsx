@@ -84,3 +84,4 @@ export default function ProductSliderCard({ product, index = 0 }: ProductSliderC
   );
 }
 
+

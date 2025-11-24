@@ -105,3 +105,4 @@ export default function BackgroundImageSlider({ images, autoplay = false }: Back
   );
 }
 
+
