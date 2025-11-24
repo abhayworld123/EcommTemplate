@@ -37,6 +37,7 @@ export function transformSiteConfigForDatabase(config: any) {
     contact_email: config.contact_email,
     contact_phone: config.contact_phone,
     contact_address: config.contact_address,
+    home_layout: config.home_layout,
     social_media: Object.keys(socialMedia).length > 0 ? socialMedia : null,
   };
 }

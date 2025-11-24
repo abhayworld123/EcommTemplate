@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { BackgroundConfig, HeaderConfig, NavigationItem, SiteConfig, Offer, Product, SliderConfig } from '@/types';
+import { BackgroundConfig, HeaderConfig, NavigationItem, SiteConfig, Offer, Product, SliderConfig, ThreeColumnDesignConfig, ThreeColumnItem, FiveColumnDesignConfig } from '@/types';
 import { Save, ArrowLeft, CheckCircle, XCircle, Loader2, Plus, Trash2, Edit2 } from 'lucide-react';
 
-type TabType = 'background' | 'header' | 'site' | 'offers' | 'products' | 'slider';
+type TabType = 'background' | 'header' | 'site' | 'offers' | 'products' | 'slider' | 'three-column' | 'five-column';
 
 export default function ConfigEditorPage() {
   const router = useRouter();
@@ -26,6 +26,8 @@ export default function ConfigEditorPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [savingSlider, setSavingSlider] = useState(false);
+  const [savingThreeColumn, setSavingThreeColumn] = useState(false);
+  const [savingFiveColumn, setSavingFiveColumn] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,6 +35,49 @@ export default function ConfigEditorPage() {
     id: '1',
     images: [],
     autoplay: false,
+  });
+  const [threeColumnConfig, setThreeColumnConfig] = useState<ThreeColumnDesignConfig>({
+    id: '',
+    column1_title: '',
+    column1_items: [],
+    column2_title: '',
+    column2_items: [],
+    column3_headline: '',
+    column3_subheadline: '',
+    column3_cta_text: 'Shop Now',
+    column3_cta_link: '/products',
+    column3_image_url: '',
+    display_order: 0,
+    is_active: true,
+  });
+  const [fiveColumnConfig, setFiveColumnConfig] = useState<FiveColumnDesignConfig>({
+    id: '',
+    column1_headline: '',
+    column1_subheadline: '',
+    column1_cta_text: 'Shop Now',
+    column1_cta_link: '/products',
+    column1_image_url: '',
+    column2_title: '',
+    column2_cta_text: 'Shop Now',
+    column2_cta_link: '/products',
+    column2_image_url: '',
+    column3_title: '',
+    column3_price_text: '',
+    column3_cta_text: 'Shop Now',
+    column3_cta_link: '/products',
+    column3_image_url: '',
+    column4_title: '',
+    column4_price_text: '',
+    column4_cta_text: 'Shop Now',
+    column4_cta_link: '/products',
+    column4_image_url: '',
+    column5_title: '',
+    column5_price_text: '',
+    column5_cta_text: 'Shop Now',
+    column5_cta_link: '/products',
+    column5_image_url: '',
+    display_order: 0,
+    is_active: true,
   });
   
   const [bgConfig, setBgConfig] = useState<BackgroundConfig>({
@@ -119,13 +164,15 @@ export default function ConfigEditorPage() {
   const fetchConfigs = async () => {
     try {
       // Fetch all configs in parallel
-      const [bgRes, headerRes, siteRes, offersRes, productsRes, sliderRes] = await Promise.all([
+      const [bgRes, headerRes, siteRes, offersRes, productsRes, sliderRes, threeColumnRes, fiveColumnRes] = await Promise.all([
         fetch('/api/background-config'),
         fetch('/api/header-config'),
         fetch('/api/site-config'),
         fetch('/api/offers?active=false'),
         fetch('/api/products'),
         fetch('/api/slider-config'),
+        fetch('/api/three-column-design'),
+        fetch('/api/five-column-design?include_inactive=true'),
       ]);
 
       if (bgRes.ok) {
@@ -156,6 +203,24 @@ export default function ConfigEditorPage() {
       if (sliderRes.ok) {
         const sliderData = await sliderRes.json();
         setSliderConfig(sliderData);
+      }
+
+      if (threeColumnRes.ok) {
+        const threeColumnData = await threeColumnRes.json();
+        if (Array.isArray(threeColumnData) && threeColumnData.length > 0) {
+          // Get the config with display_order 0, or the first one
+          const defaultConfig = threeColumnData.find((c: any) => c.display_order === 0) || threeColumnData[0];
+          setThreeColumnConfig(defaultConfig);
+        }
+      }
+
+      if (fiveColumnRes.ok) {
+        const fiveColumnData = await fiveColumnRes.json();
+        if (Array.isArray(fiveColumnData) && fiveColumnData.length > 0) {
+          // Get the config with display_order 0, or the first one
+          const defaultConfig = fiveColumnData.find((c: any) => c.display_order === 0) || fiveColumnData[0];
+          setFiveColumnConfig(defaultConfig);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch configs:', error);
@@ -620,6 +685,123 @@ export default function ConfigEditorPage() {
     }
   };
 
+  const handleThreeColumnSave = async () => {
+    setSavingThreeColumn(true);
+    setMessage(null);
+
+    try {
+      const method = threeColumnConfig.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/three-column-design', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(threeColumnConfig),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save configuration');
+      }
+
+      const data = await res.json();
+      setThreeColumnConfig(data);
+      setMessage({ type: 'success', text: '3 Column Design configuration saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Failed to save three column config:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save configuration',
+      });
+    } finally {
+      setSavingThreeColumn(false);
+    }
+  };
+
+  const handleFiveColumnSave = async () => {
+    setSavingFiveColumn(true);
+    setMessage(null);
+
+    try {
+      const method = fiveColumnConfig.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/five-column-design', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fiveColumnConfig),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save configuration');
+      }
+
+      const data = await res.json();
+      setFiveColumnConfig(data);
+      setMessage({ type: 'success', text: '5 Column Design configuration saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+      // Refresh configs to get updated data
+      fetchConfigs();
+    } catch (error) {
+      console.error('Failed to save five column config:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save configuration',
+      });
+    } finally {
+      setSavingFiveColumn(false);
+    }
+  };
+
+  const addColumnItem = (column: 'column1' | 'column2') => {
+    const newItem: ThreeColumnItem = {
+      image_url: '',
+      title: '',
+      description: '',
+      link: '/products',
+      discount_text: '',
+    };
+    if (column === 'column1') {
+      setThreeColumnConfig((prev) => ({
+        ...prev,
+        column1_items: [...prev.column1_items, newItem],
+      }));
+    } else {
+      setThreeColumnConfig((prev) => ({
+        ...prev,
+        column2_items: [...prev.column2_items, newItem],
+      }));
+    }
+  };
+
+  const updateColumnItem = (column: 'column1' | 'column2', index: number, field: keyof ThreeColumnItem, value: string) => {
+    if (column === 'column1') {
+      setThreeColumnConfig((prev) => {
+        const items = [...prev.column1_items];
+        items[index] = { ...items[index], [field]: value };
+        return { ...prev, column1_items: items };
+      });
+    } else {
+      setThreeColumnConfig((prev) => {
+        const items = [...prev.column2_items];
+        items[index] = { ...items[index], [field]: value };
+        return { ...prev, column2_items: items };
+      });
+    }
+  };
+
+  const removeColumnItem = (column: 'column1' | 'column2', index: number) => {
+    if (column === 'column1') {
+      setThreeColumnConfig((prev) => ({
+        ...prev,
+        column1_items: prev.column1_items.filter((_, i) => i !== index),
+      }));
+    } else {
+      setThreeColumnConfig((prev) => ({
+        ...prev,
+        column2_items: prev.column2_items.filter((_, i) => i !== index),
+      }));
+    }
+  };
+
   const addSliderImage = () => {
     if (sliderConfig.images.length >= 10) {
       setMessage({ type: 'error', text: 'Maximum 10 images allowed' });
@@ -758,6 +940,26 @@ export default function ConfigEditorPage() {
               }`}
             >
               Slider Config
+            </button>
+            <button
+              onClick={() => setActiveTab('three-column')}
+              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
+                activeTab === 'three-column'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              3 Column Design
+            </button>
+            <button
+              onClick={() => setActiveTab('five-column')}
+              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
+                activeTab === 'five-column'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              5 Column Design
             </button>
           </nav>
         </div>
@@ -2029,6 +2231,622 @@ export default function ConfigEditorPage() {
                     <>
                       <Save className="w-4 h-4" />
                       Save Slider Config
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Three Column Design Tab */}
+        {activeTab === 'three-column' && (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h2 className="text-xl font-semibold text-gray-900">3 Column Design Configuration</h2>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-8">
+                {/* Column 1 */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 1</h3>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={threeColumnConfig.column1_title}
+                      onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column1_title: e.target.value }))}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      placeholder="Best Deals on Designer Furniture"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">Items (Max 4)</label>
+                      <button
+                        onClick={() => addColumnItem('column1')}
+                        disabled={threeColumnConfig.column1_items.length >= 4}
+                        className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add Item
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {threeColumnConfig.column1_items.map((item, index) => (
+                        <div key={index} className="rounded-lg border border-gray-200 p-4 space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Image URL</label>
+                              <input
+                                type="text"
+                                value={item.image_url}
+                                onChange={(e) => updateColumnItem('column1', index, 'image_url', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="https://example.com/image.jpg"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
+                              <input
+                                type="text"
+                                value={item.title}
+                                onChange={(e) => updateColumnItem('column1', index, 'title', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="Product Title"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Link</label>
+                              <input
+                                type="text"
+                                value={item.link}
+                                onChange={(e) => updateColumnItem('column1', index, 'link', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="/products/123"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Discount Text</label>
+                              <input
+                                type="text"
+                                value={item.discount_text || ''}
+                                onChange={(e) => updateColumnItem('column1', index, 'discount_text', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="Min. 50% Off"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeColumnItem('column1', index)}
+                            className="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-3 h-3 inline mr-1" />
+                            Remove Item
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 2</h3>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={threeColumnConfig.column2_title}
+                      onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column2_title: e.target.value }))}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      placeholder="Winter Essentials for You"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">Items (Max 4)</label>
+                      <button
+                        onClick={() => addColumnItem('column2')}
+                        disabled={threeColumnConfig.column2_items.length >= 4}
+                        className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add Item
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {threeColumnConfig.column2_items.map((item, index) => (
+                        <div key={index} className="rounded-lg border border-gray-200 p-4 space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Image URL</label>
+                              <input
+                                type="text"
+                                value={item.image_url}
+                                onChange={(e) => updateColumnItem('column2', index, 'image_url', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="https://example.com/image.jpg"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Title</label>
+                              <input
+                                type="text"
+                                value={item.title}
+                                onChange={(e) => updateColumnItem('column2', index, 'title', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="Product Title"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Link</label>
+                              <input
+                                type="text"
+                                value={item.link}
+                                onChange={(e) => updateColumnItem('column2', index, 'link', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="/products/123"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Discount Text</label>
+                              <input
+                                type="text"
+                                value={item.discount_text || ''}
+                                onChange={(e) => updateColumnItem('column2', index, 'discount_text', e.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                placeholder="Min. 50% Off"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeColumnItem('column2', index)}
+                            className="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-3 h-3 inline mr-1" />
+                            Remove Item
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3 */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 3 (Promotional Banner)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                      <input
+                        type="text"
+                        value={threeColumnConfig.column3_headline}
+                        onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column3_headline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop your fashion Needs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Sub-headline</label>
+                      <input
+                        type="text"
+                        value={threeColumnConfig.column3_subheadline || ''}
+                        onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column3_subheadline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="with Latest & Trendy Choices"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={threeColumnConfig.column3_cta_text}
+                        onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column3_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop Now"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={threeColumnConfig.column3_cta_link}
+                        onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column3_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={threeColumnConfig.column3_image_url || ''}
+                        onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, column3_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/promotional-image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Display Order & Active */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                    <input
+                      type="number"
+                      value={threeColumnConfig.display_order}
+                      onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 pt-8">
+                    <input
+                      type="checkbox"
+                      id="three-column-active"
+                      checked={threeColumnConfig.is_active}
+                      onChange={(e) => setThreeColumnConfig((prev) => ({ ...prev, is_active: e.target.checked }))}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="three-column-active" className="text-sm font-medium text-gray-700">
+                      Active
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleThreeColumnSave}
+                  disabled={savingThreeColumn}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingThreeColumn ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save 3 Column Design Config
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Five Column Design Tab */}
+        {activeTab === 'five-column' && (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h2 className="text-xl font-semibold text-gray-900">5 Column Design Configuration</h2>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-8">
+                {/* Column 1 - Large Promotional Tile */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 1 (Large Promotional Tile)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column1_headline}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column1_headline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="A feast for 10, under $4 per person*"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Sub-headline</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column1_subheadline || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column1_subheadline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Optional sub-headline"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column1_cta_text}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column1_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop the list"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column1_cta_link}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column1_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column1_image_url || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column1_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2 - Top Left */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 2 (Top Left)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column2_title}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column2_title: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Ingredients in 1 click"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column2_cta_text}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column2_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop now"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column2_cta_link}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column2_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column2_image_url || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column2_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3 - Top Right */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 3 (Top Right)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column3_title}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column3_title: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Picture-perfect holiday looks"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Price Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column3_price_text || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column3_price_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="From $10"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column3_cta_text}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column3_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop now"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column3_cta_link}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column3_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column3_image_url || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column3_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 4 - Bottom Left */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 4 (Bottom Left)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column4_title}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column4_title: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Tabletop perfection"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Price Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column4_price_text || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column4_price_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Starting at $4.48"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column4_cta_text}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column4_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop now"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column4_cta_link}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column4_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column4_image_url || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column4_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 5 - Bottom Right */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Column 5 (Bottom Right)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column5_title}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column5_title: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Pantry staples starting at 50¢"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Price Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column5_price_text || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column5_price_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Starting at 50¢"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column5_cta_text}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column5_cta_text: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Shop now"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column5_cta_link}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column5_cta_link: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="/products"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                      <input
+                        type="text"
+                        value={fiveColumnConfig.column5_image_url || ''}
+                        onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, column5_image_url: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Display Order & Active */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                    <input
+                      type="number"
+                      value={fiveColumnConfig.display_order}
+                      onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 pt-8">
+                    <input
+                      type="checkbox"
+                      id="five-column-active"
+                      checked={fiveColumnConfig.is_active}
+                      onChange={(e) => setFiveColumnConfig((prev) => ({ ...prev, is_active: e.target.checked }))}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="five-column-active" className="text-sm font-medium text-gray-700">
+                      Active
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleFiveColumnSave}
+                  disabled={savingFiveColumn}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingFiveColumn ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save 5 Column Design Config
                     </>
                   )}
                 </button>

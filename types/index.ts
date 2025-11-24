@@ -149,3 +149,60 @@ export interface BackgroundConfig {
   updated_at?: string;
 }
 
+export interface ThreeColumnItem {
+  image_url: string;
+  title: string;
+  description?: string;
+  link: string;
+  discount_text?: string;
+}
+
+export interface ThreeColumnDesignConfig {
+  id: string;
+  column1_title: string;
+  column1_items: ThreeColumnItem[];
+  column2_title: string;
+  column2_items: ThreeColumnItem[];
+  column3_headline: string;
+  column3_subheadline?: string;
+  column3_cta_text: string;
+  column3_cta_link: string;
+  column3_image_url?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FiveColumnDesignConfig {
+  id: string;
+  column1_headline: string;
+  column1_subheadline?: string;
+  column1_cta_text: string;
+  column1_cta_link: string;
+  column1_image_url?: string;
+  column2_title: string;
+  column2_cta_text: string;
+  column2_cta_link: string;
+  column2_image_url?: string;
+  column3_title: string;
+  column3_price_text?: string;
+  column3_cta_text: string;
+  column3_cta_link: string;
+  column3_image_url?: string;
+  column4_title: string;
+  column4_price_text?: string;
+  column4_cta_text: string;
+  column4_cta_link: string;
+  column4_image_url?: string;
+  column5_title: string;
+  column5_price_text?: string;
+  column5_cta_text: string;
+  column5_cta_link: string;
+  column5_image_url?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+

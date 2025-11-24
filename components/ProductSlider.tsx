@@ -73,7 +73,7 @@ export default function ProductSlider({ config, products }: ProductSliderProps) 
 
   return (
     <div
-      className="relative py-8 md:py-12"
+      className="relative py-4 md:py-6"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { SiteConfig } from '@/types';
 import { Reorder, useDragControls } from 'framer-motion';
-import { Save, GripVertical, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Save, GripVertical, ArrowLeft, CheckCircle, AlertCircle, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 
 const COMPONENT_LABELS: Record<string, string> = {
@@ -14,6 +14,8 @@ const COMPONENT_LABELS: Record<string, string> = {
   background_image_slider: 'Background Image Slider',
   product_sliders: 'Product Sliders',
   featured_products: 'Featured Products',
+  three_column_design: '3 Column Design',
+  five_column_design: '5 Column Design',
 };
 
 export default function LayoutEditorPage() {
@@ -94,6 +96,20 @@ export default function LayoutEditorPage() {
     }
   };
 
+  const addComponent = (componentKey: string) => {
+    if (!layout.includes(componentKey)) {
+      setLayout([...layout, componentKey]);
+    }
+  };
+
+  const removeComponent = (componentKey: string) => {
+    setLayout(layout.filter((item) => item !== componentKey));
+  };
+
+  const availableComponents = Object.keys(COMPONENT_LABELS).filter(
+    (key) => !layout.includes(key)
+  );
+
   if (authLoading || loading || !isAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 pt-32 pb-12 flex items-center justify-center">
@@ -150,23 +166,68 @@ export default function LayoutEditorPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <p className="text-gray-600 mb-6">
-            Drag and drop items to reorder the sections on the homepage.
-          </p>
+        <div className="space-y-6">
+          {/* Available Components */}
+          {availableComponents.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Components</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Click to add components to your homepage layout.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {availableComponents.map((componentKey) => (
+                  <button
+                    key={componentKey}
+                    onClick={() => addComponent(componentKey)}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 hover:bg-blue-50 hover:border-blue-300 transition-all text-left"
+                  >
+                    <Plus className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium text-gray-900">
+                      {COMPONENT_LABELS[componentKey]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <Reorder.Group axis="y" values={layout} onReorder={setLayout} className="space-y-4">
-            {layout.map((item) => (
-              <Reorder.Item key={item} value={item} className="cursor-grab active:cursor-grabbing">
-                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
-                  <GripVertical className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium text-gray-900">
-                    {COMPONENT_LABELS[item] || item}
-                  </span>
-                </div>
-              </Reorder.Item>
-            ))}
-          </Reorder.Group>
+          {/* Current Layout */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Current Layout</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Drag and drop items to reorder. Click X to remove.
+                </p>
+              </div>
+            </div>
+
+            {layout.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">
+                <p>No components in layout. Add components from above.</p>
+              </div>
+            ) : (
+              <Reorder.Group axis="y" values={layout} onReorder={setLayout} className="space-y-3">
+                {layout.map((item) => (
+                  <Reorder.Item key={item} value={item} className="cursor-grab active:cursor-grabbing">
+                    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
+                      <GripVertical className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      <span className="font-medium text-gray-900 flex-1">
+                        {COMPONENT_LABELS[item] || item}
+                      </span>
+                      <button
+                        onClick={() => removeComponent(item)}
+                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                        title="Remove component"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
+            )}
+          </div>
         </div>
       </div>
     </div>

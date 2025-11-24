@@ -45,7 +45,7 @@ export default function BackgroundImageSlider({ images, autoplay = false }: Back
 
   return (
     <div
-      className="relative w-full overflow-hidden py-12 md:py-16"
+      className="relative w-full overflow-hidden py-6 md:py-8"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

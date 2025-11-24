@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 
-type ImportType = 'products' | 'offers' | 'site-config' | 'slider-config' | 'header-config' | 'product-sliders' | 'background-config';
+type ImportType = 'products' | 'offers' | 'site-config' | 'slider-config' | 'header-config' | 'product-sliders' | 'background-config' | 'three-column-design' | 'five-column-design';
 
 export default function DataImportPage() {
   const router = useRouter();
@@ -32,6 +32,8 @@ export default function DataImportPage() {
     'header-config': null,
     'product-sliders': null,
     'background-config': null,
+    'three-column-design': null,
+    'five-column-design': null,
   });
 
   const handleFileUpload = async (type: ImportType, file: File) => {
@@ -65,6 +67,12 @@ export default function DataImportPage() {
         case 'background-config':
           endpoint = '/api/admin/background-config/import';
           break;
+        case 'three-column-design':
+          endpoint = '/api/admin/three-column-design/import';
+          break;
+        case 'five-column-design':
+          endpoint = '/api/admin/five-column-design/import';
+          break;
       }
 
       const response = await fetch(endpoint, {
@@ -80,7 +88,7 @@ export default function DataImportPage() {
       const data = await response.json();
       const count = data.count || (Array.isArray(data) ? data.length : 1);
       
-      const typeLabel = type === 'site-config' ? 'site configuration' : type === 'slider-config' ? 'slider configuration' : type === 'header-config' ? 'header configuration' : type === 'product-sliders' ? 'product slider configurations' : type === 'background-config' ? 'background configuration' : type;
+      const typeLabel = type === 'site-config' ? 'site configuration' : type === 'slider-config' ? 'slider configuration' : type === 'header-config' ? 'header configuration' : type === 'product-sliders' ? 'product slider configurations' : type === 'background-config' ? 'background configuration' : type === 'three-column-design' ? 'three column design configurations' : type === 'five-column-design' ? 'five column design configurations' : type;
       
       setMessages((prev) => ({
         ...prev,
@@ -117,6 +125,8 @@ export default function DataImportPage() {
     { id: 'header-config' as ImportType, label: 'Header Config', description: 'Import header/navbar configuration from CSV/Excel' },
     { id: 'product-sliders' as ImportType, label: 'Product Sliders', description: 'Import product slider configurations from CSV/Excel' },
     { id: 'background-config' as ImportType, label: 'Background Config', description: 'Import animated background configuration from CSV/Excel' },
+    { id: 'three-column-design' as ImportType, label: '3 Column Design', description: 'Import 3 column design configuration from CSV/Excel' },
+    { id: 'five-column-design' as ImportType, label: '5 Column Design', description: 'Import 5 column design configuration from CSV/Excel' },
   ];
 
   const getCSVFormat = (type: ImportType) => {
@@ -135,6 +145,10 @@ export default function DataImportPage() {
         return 'title, type, category, limit_count, display_order, show_title, auto_scroll, scroll_speed, is_active';
       case 'background-config':
         return 'type, primary_color, secondary_color, tertiary_color, speed, direction, opacity, blur, is_active';
+      case 'three-column-design':
+        return 'column1_title, column1_item1_image_url, column1_item1_title, column1_item1_link, column1_item1_discount_text, column1_item2_image_url, column1_item2_title, column1_item2_link, column1_item2_discount_text, column1_item3_image_url, column1_item3_title, column1_item3_link, column1_item3_discount_text, column1_item4_image_url, column1_item4_title, column1_item4_link, column1_item4_discount_text, column2_title, column2_item1_image_url, column2_item1_title, column2_item1_link, column2_item1_discount_text, column2_item2_image_url, column2_item2_title, column2_item2_link, column2_item2_discount_text, column2_item3_image_url, column2_item3_title, column2_item3_link, column2_item3_discount_text, column2_item4_image_url, column2_item4_title, column2_item4_link, column2_item4_discount_text, column3_headline, column3_subheadline, column3_cta_text, column3_cta_link, column3_image_url, display_order, is_active';
+      case 'five-column-design':
+        return 'column1_headline, column1_subheadline, column1_cta_text, column1_cta_link, column1_image_url, column2_title, column2_cta_text, column2_cta_link, column2_image_url, column3_title, column3_price_text, column3_cta_text, column3_cta_link, column3_image_url, column4_title, column4_price_text, column4_cta_text, column4_cta_link, column4_image_url, column5_title, column5_price_text, column5_cta_text, column5_cta_link, column5_image_url, display_order, is_active';
       default:
         return '';
     }
@@ -250,6 +264,24 @@ export default function DataImportPage() {
                       Download Example CSV
                     </a>
                   )}
+                  {tab.id === 'three-column-design' && (
+                    <a
+                      href="/three-column-design-example.csv"
+                      download
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Download Example CSV
+                    </a>
+                  )}
+                  {tab.id === 'five-column-design' && (
+                    <a
+                      href="/five-column-design-example.csv"
+                      download
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Download Example CSV
+                    </a>
+                  )}
                 </div>
                 <code className="text-xs text-gray-600">{getCSVFormat(tab.id)}</code>
                 <p className="mt-2 text-xs text-gray-500">
@@ -259,6 +291,8 @@ export default function DataImportPage() {
                   {tab.id === 'header-config' && 'Note: navigation_items should be JSON array or pipe-separated format (Label1|href1,Label2|href2). style options: default, centered, minimal, modern, classic. Colors should be hex codes.'}
                   {tab.id === 'product-sliders' && 'Note: type options: all, category, featured, newest. If type is "category", provide category name. show_title, auto_scroll, and is_active should be true/false. scroll_speed is in seconds (default: 5).'}
                   {tab.id === 'background-config' && 'Note: type options: gradient, mesh, particles, grid. speed is 1-20 (default 5). opacity 0-100. blur in px.'}
+                  {tab.id === 'three-column-design' && 'Note: Column 1 and Column 2 can have up to 4 items each. Each item requires image_url and title. Column 3 is a promotional banner with headline, sub-headline, CTA button, and optional image. display_order determines ordering if multiple configs exist. is_active should be true/false.'}
+                  {tab.id === 'five-column-design' && 'Note: Column 1 is a large promotional tile with headline, sub-headline, CTA, and image. Columns 2-5 are smaller tiles arranged in a 2x2 grid. Columns 3-5 can have optional price_text. display_order determines ordering if multiple configs exist. is_active should be true/false.'}
                 </p>
               </div>
 

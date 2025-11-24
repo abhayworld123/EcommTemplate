@@ -5,6 +5,8 @@ import BackgroundImageSlider from '@/components/BackgroundImageSlider';
 import ProductSliders from '@/components/ProductSliders';
 import HeroBanner from '@/components/HeroBanner';
 import FeaturedProducts from '@/components/FeaturedProducts';
+import ThreeColumnDesign from '@/components/ThreeColumnDesign';
+import FiveColumnDesign from '@/components/FiveColumnDesign';
 import { Product } from '@/types';
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -118,6 +120,10 @@ export default async function Home() {
         return <ProductSliders key="product_sliders" />;
       case 'featured_products':
         return <FeaturedProducts key="featured_products" products={featuredProducts} config={config} />;
+      case 'three_column_design':
+        return <ThreeColumnDesign key="three_column_design" />;
+      case 'five_column_design':
+        return <FiveColumnDesign key="five_column_design" />;
       default:
         return null;
     }

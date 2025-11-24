@@ -70,7 +70,7 @@ export default function OffersCarousel() {
 
   return (
     <div
-      className="relative w-full overflow-hidden pt-12 md:pt-16 pb-4 md:pb-6"
+      className="relative w-full overflow-hidden pt-6 md:pt-8 pb-2 md:pb-3"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

@@ -12,8 +12,8 @@ interface FeaturedProductsProps {
 
 export default function FeaturedProducts({ products, config }: FeaturedProductsProps) {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="text-center mb-8">
         <div className="inline-block mb-4">
           <span className="text-sm font-semibold text-blue-600 uppercase tracking-wider">
             Featured
