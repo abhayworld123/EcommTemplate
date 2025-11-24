@@ -114,6 +114,13 @@ export default function AdminDashboard() {
             <h3 className="font-semibold text-gray-900">Background Config</h3>
             <p className="mt-1 text-sm text-gray-600">Edit background</p>
           </Link>
+          <Link
+            href="/admin/layout-editor"
+            className="rounded-lg border border-gray-200 bg-white p-4 hover:bg-gray-50"
+          >
+            <h3 className="font-semibold text-gray-900">Homepage Layout</h3>
+            <p className="mt-1 text-sm text-gray-600">Reorder sections</p>
+          </Link>
         </div>
         
         {/* Stats */}

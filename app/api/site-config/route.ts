@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
       banner_image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200',
       description: 'Premium products for your needs',
       theme_color: '#2563eb',
+      home_layout: ['hero_banner', 'offers_carousel', 'background_image_slider', 'product_sliders', 'featured_products'],
     }, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

@@ -45,6 +45,7 @@ export interface SiteConfig {
   contact_email?: string;
   contact_phone?: string;
   contact_address?: string;
+  home_layout?: string[];
   social_media?: {
     facebook?: string;
     twitter?: string;
