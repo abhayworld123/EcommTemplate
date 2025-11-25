@@ -121,7 +121,7 @@ export default function FiveColumnDesign() {
                     <div className="relative w-full aspect-[4/3] mb-4 rounded-lg overflow-hidden">
                       <Image
                         key={imageKeys.get(imageKey) || 0}
-                        src={config.column1_image_url}
+                        src={config.column1_image_url!}
                         alt={config.column1_headline}
                         width={400}
                         height={300}
@@ -171,7 +171,7 @@ export default function FiveColumnDesign() {
                     return isValidUrl ? (
                       <Image
                         key={imageKeys.get(imageKey) || 0}
-                        src={config.column2_image_url}
+                        src={config.column2_image_url!}
                         alt={config.column2_title}
                         width={300}
                         height={225}
@@ -223,7 +223,7 @@ export default function FiveColumnDesign() {
                     return isValidUrl ? (
                       <Image
                         key={imageKeys.get(imageKey) || 0}
-                        src={config.column3_image_url}
+                        src={config.column3_image_url!}
                         alt={config.column3_title}
                         width={300}
                         height={225}
@@ -278,7 +278,7 @@ export default function FiveColumnDesign() {
                     return isValidUrl ? (
                       <Image
                         key={imageKeys.get(imageKey) || 0}
-                        src={config.column4_image_url}
+                        src={config.column4_image_url!}
                         alt={config.column4_title}
                         width={300}
                         height={225}
@@ -333,7 +333,7 @@ export default function FiveColumnDesign() {
                     return isValidUrl ? (
                       <Image
                         key={imageKeys.get(imageKey) || 0}
-                        src={config.column5_image_url}
+                        src={config.column5_image_url!}
                         alt={config.column5_title}
                         width={300}
                         height={225}
