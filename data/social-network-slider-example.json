@@ -1,0 +1,43 @@
+{
+  "headline": "Social Network Posts",
+  "posts": [
+    {
+      "media_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop",
+      "media_type": "image",
+      "product_title": "No Boundaries Off The Shoulder Top",
+      "product_price": "$13.98",
+      "product_link": "/products/1",
+      "social_handle": "@life.styledbylindsey",
+      "caption": "Check out this amazing top!",
+      "tag_position_x": 50,
+      "tag_position_y": 30
+    },
+    {
+      "media_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=600&fit=crop",
+      "media_type": "image",
+      "product_title": "No Boundaries High Rise Baggy Jeans",
+      "product_price": "$16.98",
+      "product_link": "/products/2",
+      "social_handle": "@heyitsabbeyb",
+      "caption": "Love these jeans!",
+      "tag_position_x": 45,
+      "tag_position_y": 35
+    },
+    {
+      "media_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=600&fit=crop",
+      "media_type": "image",
+      "product_title": "Avia Women's 5000 Sneakers",
+      "product_price": "$24.98",
+      "product_link": "/products/3",
+      "social_handle": "@sheshoe_game",
+      "caption": "Perfect for everyday wear!",
+      "tag_position_x": 50,
+      "tag_position_y": 40
+    }
+  ],
+  "display_order": 0,
+  "is_active": true,
+  "autoplay": false,
+  "scroll_speed": 5
+}
+

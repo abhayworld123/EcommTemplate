@@ -1,0 +1,7 @@
+title,type,category,limit_count,display_order,show_title,auto_scroll,scroll_speed,is_active
+Featured Products,featured,,8,1,true,false,5,true
+New Arrivals,newest,,10,2,true,true,5,true
+Watches,category,Watches,12,3,true,false,5,true
+All Products,all,,20,4,true,false,5,true
+
+

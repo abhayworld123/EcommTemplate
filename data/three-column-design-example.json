@@ -1,0 +1,72 @@
+{
+  "column1_title": "Best Deals on Designer Furniture",
+  "column1_items": [
+    {
+      "image_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
+      "title": "Collapsible Wardrobe",
+      "description": "Spacious collapsible wardrobe for your home",
+      "link": "/products/wardrobe",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=400&fit=crop",
+      "title": "Home Temple",
+      "description": "Beautiful wooden home temple",
+      "link": "/products/temple",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=400&fit=crop",
+      "title": "Kitchen Trolleys",
+      "description": "Modern kitchen storage solution",
+      "link": "/products/trolley",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
+      "title": "Coat & Umbrella Stand",
+      "description": "Organize your entryway",
+      "link": "/products/stand",
+      "discount_text": "Min. 50% Off"
+    }
+  ],
+  "column2_title": "Winter Essentials for You",
+  "column2_items": [
+    {
+      "image_url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop",
+      "title": "Men's Jackets",
+      "description": "Warm and stylish jackets",
+      "link": "/products/jacket",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1624378515194-6e8c90c622d9?w=400&h=400&fit=crop",
+      "title": "Men's Tracksuits",
+      "description": "Comfortable tracksuit sets",
+      "link": "/products/tracksuit",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=400&h=400&fit=crop",
+      "title": "Men's Sweatshirts",
+      "description": "Cozy sweatshirts for winter",
+      "link": "/products/sweatshirt",
+      "discount_text": "Min. 50% Off"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&h=400&fit=crop",
+      "title": "Men's Caps",
+      "description": "Stylish caps and accessories",
+      "link": "/products/caps",
+      "discount_text": "Min. 50% Off"
+    }
+  ],
+  "column3_headline": "Shop your fashion Needs",
+  "column3_subheadline": "with Latest & Trendy Choices",
+  "column3_cta_text": "Shop Now >",
+  "column3_cta_link": "/products",
+  "column3_image_url": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
+  "display_order": 0,
+  "is_active": true
+}
+

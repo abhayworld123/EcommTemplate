@@ -1,0 +1,47 @@
+{
+  "id": "1",
+  "headline": "Viral Videos",
+  "videos": [
+    {
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "social_handle": "@vanessatrendyfinds",
+      "caption": "Check out this amazing find!",
+      "product_title": "No Boundaries Varsity Crewneck Pullover Women's",
+      "product_price": "$14.98",
+      "product_thumbnail": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=200&h=200&fit=crop",
+      "product_link": "/products/1"
+    },
+    {
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      "social_handle": "@babyyzolynn",
+      "caption": "short hair refresh 🐝💖🌸",
+      "product_title": "The Hair Method Heat Protect Blow Out Serum 6 oz",
+      "product_price": "$10.97",
+      "product_thumbnail": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=200&h=200&fit=crop",
+      "product_link": "/products/2"
+    },
+    {
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "social_handle": "@linettecosme",
+      "caption": "finally found the viral walmart boots !!",
+      "product_title": "No Boundaries Women's Tall Riding Boot Wide Width",
+      "product_price": "$44.98",
+      "product_thumbnail": "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop",
+      "product_link": "/products/3"
+    },
+    {
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "social_handle": "@wallyfaves",
+      "caption": "PSA: Walmart did it again...",
+      "product_title": "No Boundaries Mini Tote Crossbody Bag Women's",
+      "product_price": "$9.00",
+      "product_thumbnail": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=200&h=200&fit=crop",
+      "product_link": "/products/4"
+    }
+  ],
+  "display_order": 0,
+  "is_active": true,
+  "autoplay": false,
+  "scroll_speed": 5
+}
+

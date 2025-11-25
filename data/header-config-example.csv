@@ -1,0 +1,2 @@
+id,style,background_color,text_color,hover_color,accent_color,logo_url,logo_text,sticky,transparent_on_top,navigation_items,show_search,show_cart,show_user_menu,height
+1,modern,#1a1a2e,#ffffff,#00d4ff,#00d4ff,,Modern Store,true,true,"[{""label"":""Products"",""href"":""/products""},{""label"":""About"",""href"":""/about""},{""label"":""Contact"",""href"":""/contact""}]",true,true,true,100px

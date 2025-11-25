@@ -1,0 +1,189 @@
+{
+  "headline": "Popular in clothing, shoes & accessories",
+  "products": [
+    {
+      "image_url": "https://images.unsplash.com/photo-1586350977773-b3b7ab4b3c92?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Hanes Women's Athletic Ankle Socks",
+      "price": "$10.97",
+      "unit_price": "$10.97/count",
+      "description": "10 pairs of black ankle socks",
+      "link": "/products/1",
+      "sponsored": true
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Avia Women's Performance Cushioned No Show Socks",
+      "price": "$8.99",
+      "unit_price": "$8.99/count",
+      "description": "White no-show socks",
+      "link": "/products/2",
+      "sponsored": true
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Hanes Men's Double Tough Durability over-The-Calf Tube Socks",
+      "price": "$12.99",
+      "unit_price": "$12.99/count",
+      "description": "White tube socks 6 pairs",
+      "link": "/products/3",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "AND1 Men's Socks Cushion Crew Socks",
+      "price": "$9.99",
+      "unit_price": "$9.99/count",
+      "description": "12 pairs of white crew socks",
+      "link": "/products/4",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Dr. Scholl's Men's Diabetes & Circulatory Crew Socks",
+      "price": "$14.99",
+      "unit_price": "$14.99/count",
+      "description": "6 pairs of black crew socks",
+      "link": "/products/5",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "AND1 Men's Socks Cushion No Show Socks",
+      "price": "$8.49",
+      "unit_price": "$8.49/count",
+      "description": "12 pairs of black no-show socks",
+      "link": "/products/6",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Nike Dri-FIT Crew Socks",
+      "price": "$12.00",
+      "unit_price": "$12.00/count",
+      "description": "3 pairs of athletic crew socks",
+      "link": "/products/7",
+      "sponsored": true
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Adidas Performance Cushioned Ankle Socks",
+      "price": "$11.50",
+      "unit_price": "$11.50/count",
+      "description": "6 pairs of ankle socks",
+      "link": "/products/8",
+      "sponsored": true
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Under Armour HeatGear Crew Socks",
+      "price": "$13.99",
+      "unit_price": "$13.99/count",
+      "description": "3 pairs of moisture-wicking socks",
+      "link": "/products/9",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Puma Performance Cushion Ankle Socks",
+      "price": "$10.99",
+      "unit_price": "$10.99/count",
+      "description": "6 pairs of athletic socks",
+      "link": "/products/10",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "New Balance Cushion Crew Socks",
+      "price": "$11.99",
+      "unit_price": "$11.99/count",
+      "description": "6 pairs of crew socks",
+      "link": "/products/11",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Reebok Cushion Ankle Socks",
+      "price": "$9.99",
+      "unit_price": "$9.99/count",
+      "description": "6 pairs of ankle socks",
+      "link": "/products/12",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Champion Powerblend Crew Socks",
+      "price": "$8.99",
+      "unit_price": "$8.99/count",
+      "description": "12 pairs of crew socks",
+      "link": "/products/13",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Stance Socks Icon Crew Socks",
+      "price": "$15.99",
+      "unit_price": "$15.99/count",
+      "description": "3 pairs of premium crew socks",
+      "link": "/products/14",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Bombas Men's Ankle Socks",
+      "price": "$12.00",
+      "unit_price": "$12.00/count",
+      "description": "4 pairs of ankle socks",
+      "link": "/products/15",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Gold Toe Men's Dress Socks",
+      "price": "$9.99",
+      "unit_price": "$9.99/count",
+      "description": "6 pairs of dress socks",
+      "link": "/products/16",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Calvin Klein Men's Ankle Socks",
+      "price": "$14.99",
+      "unit_price": "$14.99/count",
+      "description": "6 pairs of ankle socks",
+      "link": "/products/17",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Tommy Hilfiger Men's Crew Socks",
+      "price": "$13.50",
+      "unit_price": "$13.50/count",
+      "description": "6 pairs of crew socks",
+      "link": "/products/18",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Ralph Lauren Men's Ankle Socks",
+      "price": "$16.99",
+      "unit_price": "$16.99/count",
+      "description": "6 pairs of ankle socks",
+      "link": "/products/19",
+      "sponsored": false
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&auto=format&q=80",
+      "title": "Columbia Men's Hiking Socks",
+      "price": "$12.99",
+      "unit_price": "$12.99/count",
+      "description": "3 pairs of hiking socks",
+      "link": "/products/20",
+      "sponsored": false
+    }
+  ],
+  "display_order": 0,
+  "is_active": true,
+  "autoplay": false,
+  "scroll_speed": 5
+}

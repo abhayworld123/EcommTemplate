@@ -1,0 +1,31 @@
+{
+  "column1_headline": "A feast for 10 under $4 per person*",
+  "column1_subheadline": "",
+  "column1_cta_text": "Shop the list",
+  "column1_cta_link": "/products",
+  "column1_image_url": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=400&fit=crop&auto=format",
+  "column2_title": "Ingredients in 1 click",
+  "column2_cta_text": "Shop now",
+  "column2_cta_link": "/products",
+  "column2_image_url": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=300&fit=crop&auto=format",
+  "column3_title": "Picture-perfect holiday looks",
+  "column3_price_text": "From $10",
+  "column3_cta_text": "Shop now",
+  "column3_cta_link": "/products",
+  "column3_image_url": "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=300&fit=crop&auto=format",
+  "column4_title": "Tabletop perfection",
+  "column4_price_text": "Starting at $4.48",
+  "column4_cta_text": "Shop now",
+  "column4_cta_link": "/products",
+  "column4_image_url": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop&auto=format",
+  "column5_title": "Pantry staples starting at 50¢",
+  "column5_price_text": "",
+  "column5_cta_text": "Shop now",
+  "column5_cta_link": "/products",
+  "column5_image_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop&auto=format",
+  "display_order": 0,
+  "is_active": true
+}
+
+
+

@@ -1,0 +1,5 @@
+type,primary_color,secondary_color,tertiary_color,speed,direction,opacity,blur,is_active
+gradient,#0ea5e9,#38bdf8,#7dd3fc,15,diagonal,100,0,true
+mesh,#1e40af,#3b82f6,#60a5fa,10,center,90,25,true
+particles,#e0f7ff,#2563eb,#1d4ed8,6,up,100,0,true
+grid,#eff6ff,#bfdbfe,#93c5fd,8,diagonal,100,0,true
