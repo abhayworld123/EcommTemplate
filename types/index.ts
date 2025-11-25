@@ -206,3 +206,71 @@ export interface FiveColumnDesignConfig {
   updated_at?: string;
 }
 
+export interface SmallProductSliderItem {
+  image_url: string;
+  title: string;
+  price: string;
+  unit_price?: string;
+  description?: string;
+  link?: string;
+  sponsored?: boolean;
+}
+
+export interface SmallProductSliderConfig {
+  id: string;
+  headline: string;
+  products: SmallProductSliderItem[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SocialNetworkPost {
+  media_url: string;
+  media_type: 'image' | 'video';
+  product_title: string;
+  product_price: string;
+  product_link?: string;
+  social_handle: string;
+  caption?: string;
+  tag_position_x?: number;
+  tag_position_y?: number;
+}
+
+export interface SocialNetworkSliderConfig {
+  id: string;
+  headline?: string;
+  posts: SocialNetworkPost[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ViralSliderVideo {
+  video_url: string;
+  social_handle: string;
+  caption?: string;
+  product_title: string;
+  product_price: string;
+  product_thumbnail: string;
+  product_link?: string;
+}
+
+export interface ViralSliderConfig {
+  id: string;
+  headline?: string;
+  videos: ViralSliderVideo[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
