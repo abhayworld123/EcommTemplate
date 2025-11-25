@@ -16,6 +16,9 @@ const COMPONENT_LABELS: Record<string, string> = {
   featured_products: 'Featured Products',
   three_column_design: '3 Column Design',
   five_column_design: '5 Column Design',
+  small_product_slider: 'Small Product Slider',
+  social_network_slider: 'Social Network Slider',
+  viral_slider: 'Viral Slider',
 };
 
 export default function LayoutEditorPage() {

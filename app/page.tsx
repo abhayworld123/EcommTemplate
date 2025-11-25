@@ -7,6 +7,9 @@ import HeroBanner from '@/components/HeroBanner';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import ThreeColumnDesign from '@/components/ThreeColumnDesign';
 import FiveColumnDesign from '@/components/FiveColumnDesign';
+import SmallProductSlider from '@/components/SmallProductSlider';
+import SocialNetworkSlider from '@/components/SocialNetworkSlider';
+import ViralSlider from '@/components/ViralSlider';
 import { Product } from '@/types';
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -124,6 +127,12 @@ export default async function Home() {
         return <ThreeColumnDesign key="three_column_design" />;
       case 'five_column_design':
         return <FiveColumnDesign key="five_column_design" />;
+      case 'small_product_slider':
+        return <SmallProductSlider key="small_product_slider" />;
+      case 'social_network_slider':
+        return <SocialNetworkSlider key="social_network_slider" />;
+      case 'viral_slider':
+        return <ViralSlider key="viral_slider" />;
       default:
         return null;
     }

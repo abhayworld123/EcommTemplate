@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ThreeColumnDesignConfig, ThreeColumnItem } from '@/types';
@@ -24,6 +24,10 @@ const getPlaceholderImage = () => {
 export default function ThreeColumnDesign() {
   const [configs, setConfigs] = useState<ThreeColumnDesignConfig[]>([]);
   const [loading, setLoading] = useState(true);
+  const imageRetryCounts = useRef<Map<string, number>>(new Map());
+  const imageRetryTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const [imageKeys, setImageKeys] = useState<Map<string, number>>(new Map());
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch('/api/three-column-design')
@@ -38,6 +42,51 @@ export default function ThreeColumnDesign() {
         setLoading(false);
       });
   }, []);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      imageRetryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
+      imageRetryTimeouts.current.clear();
+    };
+  }, []);
+
+  const handleImageError = (imageKey: string, imageUrl: string) => {
+    const currentRetries = imageRetryCounts.current.get(imageKey) || 0;
+    const maxRetries = 5;
+
+    // Clear any existing timeout for this image
+    const existingTimeout = imageRetryTimeouts.current.get(imageKey);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
+    if (currentRetries < maxRetries) {
+      // Increment retry count
+      const newRetryCount = currentRetries + 1;
+      imageRetryCounts.current.set(imageKey, newRetryCount);
+
+      // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+      const delay = Math.min(1000 * Math.pow(2, currentRetries), 16000);
+
+      // Schedule retry
+      const timeout = setTimeout(() => {
+        // Force re-render by updating the key
+        setImageKeys((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(imageKey, (newMap.get(imageKey) || 0) + 1);
+          return newMap;
+        });
+        imageRetryTimeouts.current.delete(imageKey);
+      }, delay);
+
+      imageRetryTimeouts.current.set(imageKey, timeout);
+    } else {
+      // Max retries reached, mark as failed permanently
+      setImageErrors((prev) => new Set(prev).add(imageKey));
+      imageRetryTimeouts.current.delete(imageKey);
+    }
+  };
 
   if (loading || configs.length === 0) {
     return null;
@@ -60,25 +109,42 @@ export default function ThreeColumnDesign() {
                 <ChevronRight className="w-5 h-5 text-blue-600" />
               </div>
               <div className="grid grid-cols-2 gap-3 flex-1">
-                {config.column1_items.slice(0, 4).map((item: ThreeColumnItem, index: number) => (
-                  <Link
-                    key={index}
-                    href={item.link || '#'}
-                    className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
-                  >
-                    <div className="aspect-square w-full overflow-hidden bg-gray-100">
-                      <Image
-                        src={isValidImageUrl(item.image_url) ? item.image_url! : getPlaceholderImage()}
-                        alt={item.title}
-                        width={200}
-                        height={200}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = getPlaceholderImage();
-                        }}
-                      />
-                    </div>
+                {config.column1_items.slice(0, 4).map((item: ThreeColumnItem, index: number) => {
+                  const imageKey = `${config.id}-column1-item${index}`;
+                  const hasError = imageErrors.has(imageKey);
+                  const isValidUrl = isValidImageUrl(item.image_url) && !hasError;
+                  
+                  return (
+                    <Link
+                      key={index}
+                      href={item.link || '#'}
+                      className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                      <div className="aspect-square w-full overflow-hidden bg-gray-100">
+                        <Image
+                          key={imageKeys.get(imageKey) || 0}
+                          src={isValidUrl ? item.image_url! : getPlaceholderImage()}
+                          alt={item.title}
+                          width={200}
+                          height={200}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={() => {
+                            if (item.image_url) {
+                              handleImageError(imageKey, item.image_url);
+                            }
+                          }}
+                          onLoad={() => {
+                            // Reset retry count on successful load
+                            imageRetryCounts.current.delete(imageKey);
+                            const timeout = imageRetryTimeouts.current.get(imageKey);
+                            if (timeout) {
+                              clearTimeout(timeout);
+                              imageRetryTimeouts.current.delete(imageKey);
+                            }
+                          }}
+                          unoptimized
+                        />
+                      </div>
                     <div className="p-3">
                       <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1">
                         {item.title}
@@ -90,7 +156,8 @@ export default function ThreeColumnDesign() {
                       )}
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -106,25 +173,42 @@ export default function ThreeColumnDesign() {
                 <ChevronRight className="w-5 h-5 text-blue-600" />
               </div>
               <div className="grid grid-cols-2 gap-3 flex-1">
-                {config.column2_items.slice(0, 4).map((item: ThreeColumnItem, index: number) => (
-                  <Link
-                    key={index}
-                    href={item.link || '#'}
-                    className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
-                  >
-                    <div className="aspect-square w-full overflow-hidden bg-gray-100">
-                      <Image
-                        src={isValidImageUrl(item.image_url) ? item.image_url! : getPlaceholderImage()}
-                        alt={item.title}
-                        width={200}
-                        height={200}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = getPlaceholderImage();
-                        }}
-                      />
-                    </div>
+                {config.column2_items.slice(0, 4).map((item: ThreeColumnItem, index: number) => {
+                  const imageKey = `${config.id}-column2-item${index}`;
+                  const hasError = imageErrors.has(imageKey);
+                  const isValidUrl = isValidImageUrl(item.image_url) && !hasError;
+                  
+                  return (
+                    <Link
+                      key={index}
+                      href={item.link || '#'}
+                      className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                      <div className="aspect-square w-full overflow-hidden bg-gray-100">
+                        <Image
+                          key={imageKeys.get(imageKey) || 0}
+                          src={isValidUrl ? item.image_url! : getPlaceholderImage()}
+                          alt={item.title}
+                          width={200}
+                          height={200}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={() => {
+                            if (item.image_url) {
+                              handleImageError(imageKey, item.image_url);
+                            }
+                          }}
+                          onLoad={() => {
+                            // Reset retry count on successful load
+                            imageRetryCounts.current.delete(imageKey);
+                            const timeout = imageRetryTimeouts.current.get(imageKey);
+                            if (timeout) {
+                              clearTimeout(timeout);
+                              imageRetryTimeouts.current.delete(imageKey);
+                            }
+                          }}
+                          unoptimized
+                        />
+                      </div>
                     <div className="p-3">
                       <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1">
                         {item.title}
@@ -136,7 +220,8 @@ export default function ThreeColumnDesign() {
                       )}
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -156,21 +241,39 @@ export default function ThreeColumnDesign() {
                     </p>
                   )}
                 </div>
-                {config.column3_image_url && isValidImageUrl(config.column3_image_url) && (
-                  <div className="relative w-full aspect-[4/3] mb-6 rounded-lg overflow-hidden">
-                    <Image
-                      src={config.column3_image_url}
-                      alt={config.column3_headline}
-                      width={400}
-                      height={300}
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
+                {(() => {
+                  const imageKey = `${config.id}-column3`;
+                  const hasError = imageErrors.has(imageKey);
+                  const isValidUrl = config.column3_image_url && isValidImageUrl(config.column3_image_url) && !hasError;
+                  
+                  return isValidUrl ? (
+                    <div className="relative w-full aspect-[4/3] mb-6 rounded-lg overflow-hidden">
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column3_image_url!}
+                        alt={config.column3_headline}
+                        width={400}
+                        height={300}
+                        className="h-full w-full object-cover"
+                        onError={() => {
+                          if (config.column3_image_url) {
+                            handleImageError(imageKey, config.column3_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    </div>
+                  ) : null;
+                })()}
                 <Link
                   href={config.column3_cta_link || '/products'}
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-6 py-3 text-white font-semibold hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg"

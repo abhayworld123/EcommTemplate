@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 
-type ImportType = 'products' | 'offers' | 'site-config' | 'slider-config' | 'header-config' | 'product-sliders' | 'background-config' | 'three-column-design' | 'five-column-design';
+type ImportType = 'products' | 'offers' | 'site-config' | 'slider-config' | 'header-config' | 'product-sliders' | 'background-config' | 'three-column-design' | 'five-column-design' | 'small-product-slider' | 'social-network-slider' | 'viral-slider';
 
 export default function DataImportPage() {
   const router = useRouter();
@@ -34,6 +34,9 @@ export default function DataImportPage() {
     'background-config': null,
     'three-column-design': null,
     'five-column-design': null,
+    'small-product-slider': null,
+    'social-network-slider': null,
+    'viral-slider': null,
   });
 
   const handleFileUpload = async (type: ImportType, file: File) => {
@@ -73,6 +76,15 @@ export default function DataImportPage() {
         case 'five-column-design':
           endpoint = '/api/admin/five-column-design/import';
           break;
+        case 'small-product-slider':
+          endpoint = '/api/admin/small-product-slider/import';
+          break;
+        case 'social-network-slider':
+          endpoint = '/api/admin/social-network-slider/import';
+          break;
+        case 'viral-slider':
+          endpoint = '/api/admin/viral-slider/import';
+          break;
       }
 
       const response = await fetch(endpoint, {
@@ -88,7 +100,7 @@ export default function DataImportPage() {
       const data = await response.json();
       const count = data.count || (Array.isArray(data) ? data.length : 1);
       
-      const typeLabel = type === 'site-config' ? 'site configuration' : type === 'slider-config' ? 'slider configuration' : type === 'header-config' ? 'header configuration' : type === 'product-sliders' ? 'product slider configurations' : type === 'background-config' ? 'background configuration' : type === 'three-column-design' ? 'three column design configurations' : type === 'five-column-design' ? 'five column design configurations' : type;
+      const typeLabel = type === 'site-config' ? 'site configuration' : type === 'slider-config' ? 'slider configuration' : type === 'header-config' ? 'header configuration' : type === 'product-sliders' ? 'product slider configurations' : type === 'background-config' ? 'background configuration' : type === 'three-column-design' ? 'three column design configurations' : type === 'five-column-design' ? 'five column design configurations' : type === 'small-product-slider' ? 'small product slider configurations' : type === 'social-network-slider' ? 'social network slider configurations' : type === 'viral-slider' ? 'viral slider configuration' : type;
       
       setMessages((prev) => ({
         ...prev,
@@ -127,6 +139,9 @@ export default function DataImportPage() {
     { id: 'background-config' as ImportType, label: 'Background Config', description: 'Import animated background configuration from CSV/Excel' },
     { id: 'three-column-design' as ImportType, label: '3 Column Design', description: 'Import 3 column design configuration from CSV/Excel' },
     { id: 'five-column-design' as ImportType, label: '5 Column Design', description: 'Import 5 column design configuration from CSV/Excel' },
+    { id: 'small-product-slider' as ImportType, label: 'Small Product Slider', description: 'Import small product slider configuration from CSV/Excel' },
+    { id: 'social-network-slider' as ImportType, label: 'Social Network Slider', description: 'Import social network slider configuration from CSV/Excel' },
+    { id: 'viral-slider' as ImportType, label: 'Viral Slider', description: 'Import viral slider configuration from CSV/Excel' },
   ];
 
   const getCSVFormat = (type: ImportType) => {
@@ -149,6 +164,12 @@ export default function DataImportPage() {
         return 'column1_title, column1_item1_image_url, column1_item1_title, column1_item1_link, column1_item1_discount_text, column1_item2_image_url, column1_item2_title, column1_item2_link, column1_item2_discount_text, column1_item3_image_url, column1_item3_title, column1_item3_link, column1_item3_discount_text, column1_item4_image_url, column1_item4_title, column1_item4_link, column1_item4_discount_text, column2_title, column2_item1_image_url, column2_item1_title, column2_item1_link, column2_item1_discount_text, column2_item2_image_url, column2_item2_title, column2_item2_link, column2_item2_discount_text, column2_item3_image_url, column2_item3_title, column2_item3_link, column2_item3_discount_text, column2_item4_image_url, column2_item4_title, column2_item4_link, column2_item4_discount_text, column3_headline, column3_subheadline, column3_cta_text, column3_cta_link, column3_image_url, display_order, is_active';
       case 'five-column-design':
         return 'column1_headline, column1_subheadline, column1_cta_text, column1_cta_link, column1_image_url, column2_title, column2_cta_text, column2_cta_link, column2_image_url, column3_title, column3_price_text, column3_cta_text, column3_cta_link, column3_image_url, column4_title, column4_price_text, column4_cta_text, column4_cta_link, column4_image_url, column5_title, column5_price_text, column5_cta_text, column5_cta_link, column5_image_url, display_order, is_active';
+      case 'small-product-slider':
+        return 'headline, product1_image_url, product1_title, product1_price, product1_unit_price, product1_description, product1_link, product1_sponsored, product2_image_url, product2_title, product2_price, product2_unit_price, product2_description, product2_link, product2_sponsored, product3_..., display_order, is_active, autoplay, scroll_speed';
+      case 'social-network-slider':
+        return 'headline, post1_media_url, post1_media_type, post1_product_title, post1_product_price, post1_product_link, post1_social_handle, post1_caption, post1_tag_position_x, post1_tag_position_y, post2_media_url, post2_media_type, post2_product_title, post2_product_price, post2_product_link, post2_social_handle, post2_caption, post2_tag_position_x, post2_tag_position_y, post3_..., display_order, is_active, autoplay, scroll_speed';
+      case 'viral-slider':
+        return 'headline, video1_url, video1_social_handle, video1_caption, video1_product_title, video1_product_price, video1_product_thumbnail, video1_product_link, video2_url, video2_social_handle, video2_caption, video2_product_title, video2_product_price, video2_product_thumbnail, video2_product_link, video3_..., display_order, is_active, autoplay, scroll_speed';
       default:
         return '';
     }
@@ -186,21 +207,23 @@ export default function DataImportPage() {
 
         {/* Tabs */}
         <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+          <div className="overflow-x-auto scrollbar-hide max-w-full">
+            <nav className="-mb-px flex space-x-8 min-w-max pb-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
 
         {/* Content */}
@@ -282,6 +305,33 @@ export default function DataImportPage() {
                       Download Example CSV
                     </a>
                   )}
+                  {tab.id === 'small-product-slider' && (
+                    <a
+                      href="/small-product-slider-example.csv"
+                      download
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Download Example CSV
+                    </a>
+                  )}
+                  {tab.id === 'social-network-slider' && (
+                    <a
+                      href="/social-network-slider-example.csv"
+                      download
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Download Example CSV
+                    </a>
+                  )}
+                  {tab.id === 'viral-slider' && (
+                    <a
+                      href="/viral-slider-example.csv"
+                      download
+                      className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Download Example CSV
+                    </a>
+                  )}
                 </div>
                 <code className="text-xs text-gray-600">{getCSVFormat(tab.id)}</code>
                 <p className="mt-2 text-xs text-gray-500">
@@ -293,6 +343,9 @@ export default function DataImportPage() {
                   {tab.id === 'background-config' && 'Note: type options: gradient, mesh, particles, grid. speed is 1-20 (default 5). opacity 0-100. blur in px.'}
                   {tab.id === 'three-column-design' && 'Note: Column 1 and Column 2 can have up to 4 items each. Each item requires image_url and title. Column 3 is a promotional banner with headline, sub-headline, CTA button, and optional image. display_order determines ordering if multiple configs exist. is_active should be true/false.'}
                   {tab.id === 'five-column-design' && 'Note: Column 1 is a large promotional tile with headline, sub-headline, CTA, and image. Columns 2-5 are smaller tiles arranged in a 2x2 grid. Columns 3-5 can have optional price_text. display_order determines ordering if multiple configs exist. is_active should be true/false.'}
+                  {tab.id === 'small-product-slider' && 'Note: Each row represents one slider. Products are numbered (product1, product2, etc.) up to 20 products per slider. Each product requires image_url, title, and price. Optional fields: unit_price, description, link, sponsored (true/false). display_order determines ordering if multiple sliders exist. is_active, autoplay should be true/false. scroll_speed is in seconds.'}
+                  {tab.id === 'social-network-slider' && 'Note: Each row represents one slider. Posts are numbered (post1, post2, etc.) up to 20 posts per slider. Each post requires media_url, media_type (image or video), product_title, product_price, and social_handle. Optional fields: product_link, caption, tag_position_x (0-100), tag_position_y (0-100). display_order determines ordering if multiple sliders exist. is_active, autoplay should be true/false. scroll_speed is in seconds.'}
+                  {tab.id === 'viral-slider' && 'Note: Single instance slider. Videos are numbered (video1, video2, etc.) up to 20 videos. Each video requires video_url (TikTok, Instagram Reel, or custom), social_handle, product_title, product_price, and product_thumbnail. Optional fields: caption, product_link. is_active, autoplay should be true/false. scroll_speed is in seconds.'}
                 </p>
               </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FiveColumnDesignConfig } from '@/types';
@@ -23,6 +23,10 @@ const getPlaceholderImage = () => {
 export default function FiveColumnDesign() {
   const [configs, setConfigs] = useState<FiveColumnDesignConfig[]>([]);
   const [loading, setLoading] = useState(true);
+  const imageRetryCounts = useRef<Map<string, number>>(new Map());
+  const imageRetryTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const [imageKeys, setImageKeys] = useState<Map<string, number>>(new Map());
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch('/api/five-column-design')
@@ -37,6 +41,51 @@ export default function FiveColumnDesign() {
         setLoading(false);
       });
   }, []);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      imageRetryTimeouts.current.forEach((timeout) => clearTimeout(timeout));
+      imageRetryTimeouts.current.clear();
+    };
+  }, []);
+
+  const handleImageError = (imageKey: string, imageUrl: string) => {
+    const currentRetries = imageRetryCounts.current.get(imageKey) || 0;
+    const maxRetries = 5;
+
+    // Clear any existing timeout for this image
+    const existingTimeout = imageRetryTimeouts.current.get(imageKey);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
+    if (currentRetries < maxRetries) {
+      // Increment retry count
+      const newRetryCount = currentRetries + 1;
+      imageRetryCounts.current.set(imageKey, newRetryCount);
+
+      // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+      const delay = Math.min(1000 * Math.pow(2, currentRetries), 16000);
+
+      // Schedule retry
+      const timeout = setTimeout(() => {
+        // Force re-render by updating the key
+        setImageKeys((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(imageKey, (newMap.get(imageKey) || 0) + 1);
+          return newMap;
+        });
+        imageRetryTimeouts.current.delete(imageKey);
+      }, delay);
+
+      imageRetryTimeouts.current.set(imageKey, timeout);
+    } else {
+      // Max retries reached, mark as failed permanently
+      setImageErrors((prev) => new Set(prev).add(imageKey));
+      imageRetryTimeouts.current.delete(imageKey);
+    }
+  };
 
   if (loading || configs.length === 0) {
     return null;
@@ -63,21 +112,39 @@ export default function FiveColumnDesign() {
                     </p>
                   )}
                 </div>
-                {config.column1_image_url && isValidImageUrl(config.column1_image_url) && (
-                  <div className="relative w-full aspect-[4/3] mb-4 rounded-lg overflow-hidden">
-                    <Image
-                      src={config.column1_image_url}
-                      alt={config.column1_headline}
-                      width={400}
-                      height={300}
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
+                {(() => {
+                  const imageKey = `${config.id}-column1`;
+                  const hasError = imageErrors.has(imageKey);
+                  const isValidUrl = config.column1_image_url && isValidImageUrl(config.column1_image_url) && !hasError;
+                  
+                  return isValidUrl ? (
+                    <div className="relative w-full aspect-[4/3] mb-4 rounded-lg overflow-hidden">
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column1_image_url}
+                        alt={config.column1_headline}
+                        width={400}
+                        height={300}
+                        className="h-full w-full object-cover"
+                        onError={() => {
+                          if (config.column1_image_url) {
+                            handleImageError(imageKey, config.column1_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    </div>
+                  ) : null;
+                })()}
                 <Link
                   href={config.column1_cta_link || '/products'}
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-6 py-3 text-white font-semibold hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg"
@@ -96,23 +163,41 @@ export default function FiveColumnDesign() {
                 className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                  {config.column2_image_url && isValidImageUrl(config.column2_image_url) ? (
-                    <Image
-                      src={config.column2_image_url}
-                      alt={config.column2_title}
-                      width={300}
-                      height={225}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = getPlaceholderImage();
-                      }}
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const imageKey = `${config.id}-column2`;
+                    const hasError = imageErrors.has(imageKey);
+                    const isValidUrl = config.column2_image_url && isValidImageUrl(config.column2_image_url) && !hasError;
+                    
+                    return isValidUrl ? (
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column2_image_url}
+                        alt={config.column2_title}
+                        width={300}
+                        height={225}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => {
+                          if (config.column2_image_url) {
+                            handleImageError(imageKey, config.column2_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -130,23 +215,41 @@ export default function FiveColumnDesign() {
                 className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                  {config.column3_image_url && isValidImageUrl(config.column3_image_url) ? (
-                    <Image
-                      src={config.column3_image_url}
-                      alt={config.column3_title}
-                      width={300}
-                      height={225}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = getPlaceholderImage();
-                      }}
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const imageKey = `${config.id}-column3`;
+                    const hasError = imageErrors.has(imageKey);
+                    const isValidUrl = config.column3_image_url && isValidImageUrl(config.column3_image_url) && !hasError;
+                    
+                    return isValidUrl ? (
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column3_image_url}
+                        alt={config.column3_title}
+                        width={300}
+                        height={225}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => {
+                          if (config.column3_image_url) {
+                            handleImageError(imageKey, config.column3_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -167,23 +270,41 @@ export default function FiveColumnDesign() {
                 className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                  {config.column4_image_url && isValidImageUrl(config.column4_image_url) ? (
-                    <Image
-                      src={config.column4_image_url}
-                      alt={config.column4_title}
-                      width={300}
-                      height={225}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = getPlaceholderImage();
-                      }}
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const imageKey = `${config.id}-column4`;
+                    const hasError = imageErrors.has(imageKey);
+                    const isValidUrl = config.column4_image_url && isValidImageUrl(config.column4_image_url) && !hasError;
+                    
+                    return isValidUrl ? (
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column4_image_url}
+                        alt={config.column4_title}
+                        width={300}
+                        height={225}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => {
+                          if (config.column4_image_url) {
+                            handleImageError(imageKey, config.column4_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -204,23 +325,41 @@ export default function FiveColumnDesign() {
                 className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                  {config.column5_image_url && isValidImageUrl(config.column5_image_url) ? (
-                    <Image
-                      src={config.column5_image_url}
-                      alt={config.column5_title}
-                      width={300}
-                      height={225}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = getPlaceholderImage();
-                      }}
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const imageKey = `${config.id}-column5`;
+                    const hasError = imageErrors.has(imageKey);
+                    const isValidUrl = config.column5_image_url && isValidImageUrl(config.column5_image_url) && !hasError;
+                    
+                    return isValidUrl ? (
+                      <Image
+                        key={imageKeys.get(imageKey) || 0}
+                        src={config.column5_image_url}
+                        alt={config.column5_title}
+                        width={300}
+                        height={225}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={() => {
+                          if (config.column5_image_url) {
+                            handleImageError(imageKey, config.column5_image_url);
+                          }
+                        }}
+                        onLoad={() => {
+                          // Reset retry count on successful load
+                          imageRetryCounts.current.delete(imageKey);
+                          const timeout = imageRetryTimeouts.current.get(imageKey);
+                          if (timeout) {
+                            clearTimeout(timeout);
+                            imageRetryTimeouts.current.delete(imageKey);
+                          }
+                        }}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">

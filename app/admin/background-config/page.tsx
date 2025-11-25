@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { BackgroundConfig, HeaderConfig, NavigationItem, SiteConfig, Offer, Product, SliderConfig, ThreeColumnDesignConfig, ThreeColumnItem, FiveColumnDesignConfig } from '@/types';
+import { BackgroundConfig, HeaderConfig, NavigationItem, SiteConfig, Offer, Product, SliderConfig, ThreeColumnDesignConfig, ThreeColumnItem, FiveColumnDesignConfig, SmallProductSliderConfig, SmallProductSliderItem, SocialNetworkSliderConfig, SocialNetworkPost, ViralSliderConfig, ViralSliderVideo } from '@/types';
 import { Save, ArrowLeft, CheckCircle, XCircle, Loader2, Plus, Trash2, Edit2 } from 'lucide-react';
 
-type TabType = 'background' | 'header' | 'site' | 'offers' | 'products' | 'slider' | 'three-column' | 'five-column';
+type TabType = 'background' | 'header' | 'site' | 'offers' | 'products' | 'slider' | 'three-column' | 'five-column' | 'small-product-slider' | 'social-network-slider' | 'viral-slider';
 
 export default function ConfigEditorPage() {
   const router = useRouter();
@@ -28,6 +28,31 @@ export default function ConfigEditorPage() {
   const [savingSlider, setSavingSlider] = useState(false);
   const [savingThreeColumn, setSavingThreeColumn] = useState(false);
   const [savingFiveColumn, setSavingFiveColumn] = useState(false);
+  const [savingSmallProductSlider, setSavingSmallProductSlider] = useState(false);
+  const [smallProductSliderConfigs, setSmallProductSliderConfigs] = useState<SmallProductSliderConfig[]>([]);
+  const [selectedSmallProductSliderId, setSelectedSmallProductSliderId] = useState<string>('');
+  const [savingSocialNetworkSlider, setSavingSocialNetworkSlider] = useState(false);
+  const [socialNetworkSliderConfigs, setSocialNetworkSliderConfigs] = useState<SocialNetworkSliderConfig[]>([]);
+  const [selectedSocialNetworkSliderId, setSelectedSocialNetworkSliderId] = useState<string>('');
+  const [socialNetworkSliderConfig, setSocialNetworkSliderConfig] = useState<SocialNetworkSliderConfig>({
+    id: '',
+    headline: '',
+    posts: [],
+    display_order: 0,
+    is_active: true,
+    autoplay: false,
+    scroll_speed: 5,
+  });
+  const [savingViralSlider, setSavingViralSlider] = useState(false);
+  const [viralSliderConfig, setViralSliderConfig] = useState<ViralSliderConfig>({
+    id: '1',
+    headline: '',
+    videos: [],
+    display_order: 0,
+    is_active: true,
+    autoplay: false,
+    scroll_speed: 5,
+  });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -78,6 +103,15 @@ export default function ConfigEditorPage() {
     column5_image_url: '',
     display_order: 0,
     is_active: true,
+  });
+  const [smallProductSliderConfig, setSmallProductSliderConfig] = useState<SmallProductSliderConfig>({
+    id: '',
+    headline: '',
+    products: [],
+    display_order: 0,
+    is_active: true,
+    autoplay: false,
+    scroll_speed: 5,
   });
   
   const [bgConfig, setBgConfig] = useState<BackgroundConfig>({
@@ -164,7 +198,7 @@ export default function ConfigEditorPage() {
   const fetchConfigs = async () => {
     try {
       // Fetch all configs in parallel
-      const [bgRes, headerRes, siteRes, offersRes, productsRes, sliderRes, threeColumnRes, fiveColumnRes] = await Promise.all([
+      const [bgRes, headerRes, siteRes, offersRes, productsRes, sliderRes, threeColumnRes, fiveColumnRes, smallProductSliderRes, socialNetworkSliderRes, viralSliderRes] = await Promise.all([
         fetch('/api/background-config'),
         fetch('/api/header-config'),
         fetch('/api/site-config'),
@@ -173,6 +207,9 @@ export default function ConfigEditorPage() {
         fetch('/api/slider-config'),
         fetch('/api/three-column-design'),
         fetch('/api/five-column-design?include_inactive=true'),
+        fetch('/api/small-product-slider?include_inactive=true'),
+        fetch('/api/social-network-slider?include_inactive=true'),
+        fetch('/api/viral-slider'),
       ]);
 
       if (bgRes.ok) {
@@ -220,6 +257,37 @@ export default function ConfigEditorPage() {
           // Get the config with display_order 0, or the first one
           const defaultConfig = fiveColumnData.find((c: any) => c.display_order === 0) || fiveColumnData[0];
           setFiveColumnConfig(defaultConfig);
+        }
+      }
+
+      if (smallProductSliderRes.ok) {
+        const smallProductSliderData = await smallProductSliderRes.json();
+        if (Array.isArray(smallProductSliderData)) {
+          setSmallProductSliderConfigs(smallProductSliderData);
+          if (smallProductSliderData.length > 0) {
+            const defaultConfig = smallProductSliderData.find((c: any) => c.display_order === 0) || smallProductSliderData[0];
+            setSmallProductSliderConfig(defaultConfig);
+            setSelectedSmallProductSliderId(defaultConfig.id);
+          }
+        }
+      }
+
+      if (socialNetworkSliderRes.ok) {
+        const socialNetworkSliderData = await socialNetworkSliderRes.json();
+        if (Array.isArray(socialNetworkSliderData)) {
+          setSocialNetworkSliderConfigs(socialNetworkSliderData);
+          if (socialNetworkSliderData.length > 0) {
+            const defaultConfig = socialNetworkSliderData.find((c: any) => c.display_order === 0) || socialNetworkSliderData[0];
+            setSocialNetworkSliderConfig(defaultConfig);
+            setSelectedSocialNetworkSliderId(defaultConfig.id);
+          }
+        }
+      }
+
+      if (viralSliderRes.ok) {
+        const viralSliderData = await viralSliderRes.json();
+        if (viralSliderData && viralSliderData.id) {
+          setViralSliderConfig(viralSliderData);
         }
       }
     } catch (error) {
@@ -751,6 +819,202 @@ export default function ConfigEditorPage() {
     }
   };
 
+  const handleSmallProductSliderSave = async () => {
+    setSavingSmallProductSlider(true);
+    setMessage(null);
+
+    try {
+      const method = smallProductSliderConfig.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/small-product-slider', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(smallProductSliderConfig),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save configuration');
+      }
+
+      const data = await res.json();
+      setSmallProductSliderConfig(data);
+      setSelectedSmallProductSliderId(data.id);
+      setMessage({ type: 'success', text: 'Small Product Slider configuration saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+      // Refresh configs to get updated data
+      fetchConfigs();
+    } catch (error) {
+      console.error('Failed to save small product slider config:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save configuration',
+      });
+    } finally {
+      setSavingSmallProductSlider(false);
+    }
+  };
+
+  const addSmallProductSliderProduct = () => {
+    const newProduct: SmallProductSliderItem = {
+      image_url: '',
+      title: '',
+      price: '',
+      unit_price: '',
+      description: '',
+      link: '',
+      sponsored: false,
+    };
+    setSmallProductSliderConfig((prev) => ({
+      ...prev,
+      products: [...prev.products, newProduct],
+    }));
+  };
+
+  const removeSmallProductSliderProduct = (index: number) => {
+    setSmallProductSliderConfig((prev) => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateSmallProductSliderProduct = (index: number, field: keyof SmallProductSliderItem, value: any) => {
+    setSmallProductSliderConfig((prev) => {
+      const newProducts = [...prev.products];
+      newProducts[index] = { ...newProducts[index], [field]: value };
+      return { ...prev, products: newProducts };
+    });
+  };
+
+  const handleSocialNetworkSliderSave = async () => {
+    setSavingSocialNetworkSlider(true);
+    setMessage(null);
+
+    try {
+      const method = socialNetworkSliderConfig.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/social-network-slider', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(socialNetworkSliderConfig),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save configuration');
+      }
+
+      const data = await res.json();
+      setSocialNetworkSliderConfig(data);
+      setSelectedSocialNetworkSliderId(data.id);
+      setMessage({ type: 'success', text: 'Social Network Slider configuration saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+      fetchConfigs();
+    } catch (error) {
+      console.error('Failed to save social network slider config:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save configuration',
+      });
+    } finally {
+      setSavingSocialNetworkSlider(false);
+    }
+  };
+
+  const addSocialNetworkPost = () => {
+    const newPost: SocialNetworkPost = {
+      media_url: '',
+      media_type: 'image',
+      product_title: '',
+      product_price: '',
+      product_link: '',
+      social_handle: '',
+      caption: '',
+      tag_position_x: 50,
+      tag_position_y: 30,
+    };
+    setSocialNetworkSliderConfig((prev) => ({
+      ...prev,
+      posts: [...prev.posts, newPost],
+    }));
+  };
+
+  const removeSocialNetworkPost = (index: number) => {
+    setSocialNetworkSliderConfig((prev) => ({
+      ...prev,
+      posts: prev.posts.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateSocialNetworkPost = (index: number, field: keyof SocialNetworkPost, value: any) => {
+    setSocialNetworkSliderConfig((prev) => {
+      const newPosts = [...prev.posts];
+      newPosts[index] = { ...newPosts[index], [field]: value };
+      return { ...prev, posts: newPosts };
+    });
+  };
+
+  const handleViralSliderSave = async () => {
+    setSavingViralSlider(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch('/api/viral-slider', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(viralSliderConfig),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to save configuration');
+      }
+
+      const data = await res.json();
+      setViralSliderConfig(data);
+      setMessage({ type: 'success', text: 'Viral Slider configuration saved successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+      fetchConfigs();
+    } catch (error) {
+      console.error('Failed to save viral slider config:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save configuration',
+      });
+    } finally {
+      setSavingViralSlider(false);
+    }
+  };
+
+  const addViralSliderVideo = () => {
+    const newVideo: ViralSliderVideo = {
+      video_url: '',
+      social_handle: '',
+      caption: '',
+      product_title: '',
+      product_price: '',
+      product_thumbnail: '',
+      product_link: '',
+    };
+    setViralSliderConfig((prev) => ({
+      ...prev,
+      videos: [...prev.videos, newVideo],
+    }));
+  };
+
+  const removeViralSliderVideo = (index: number) => {
+    setViralSliderConfig((prev) => ({
+      ...prev,
+      videos: prev.videos.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateViralSliderVideo = (index: number, field: keyof ViralSliderVideo, value: any) => {
+    setViralSliderConfig((prev) => {
+      const newVideos = [...prev.videos];
+      newVideos[index] = { ...newVideos[index], [field]: value };
+      return { ...prev, videos: newVideos };
+    });
+  };
+
   const addColumnItem = (column: 'column1' | 'column2') => {
     const newItem: ThreeColumnItem = {
       image_url: '',
@@ -880,88 +1144,120 @@ export default function ConfigEditorPage() {
 
         {/* Tabs */}
         <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab('background')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'background'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Background Config
-            </button>
-            <button
-              onClick={() => setActiveTab('header')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'header'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Header Config
-            </button>
-            <button
-              onClick={() => setActiveTab('site')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'site'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Site Config
-            </button>
-            <button
-              onClick={() => setActiveTab('offers')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'offers'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Offers
-            </button>
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'products'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Products
-            </button>
-            <button
-              onClick={() => setActiveTab('slider')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'slider'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Slider Config
-            </button>
-            <button
-              onClick={() => setActiveTab('three-column')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'three-column'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              3 Column Design
-            </button>
-            <button
-              onClick={() => setActiveTab('five-column')}
-              className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-                activeTab === 'five-column'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              5 Column Design
-            </button>
-          </nav>
+          <div className="overflow-x-auto scrollbar-hide max-w-full">
+            <nav className="-mb-px flex space-x-8 min-w-max pb-1">
+              <button
+                onClick={() => setActiveTab('background')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'background'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Background Config
+              </button>
+              <button
+                onClick={() => setActiveTab('header')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'header'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Header Config
+              </button>
+              <button
+                onClick={() => setActiveTab('site')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'site'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Site Config
+              </button>
+              <button
+                onClick={() => setActiveTab('offers')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'offers'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Offers
+              </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'products'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Products
+              </button>
+              <button
+                onClick={() => setActiveTab('slider')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'slider'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Slider Config
+              </button>
+              <button
+                onClick={() => setActiveTab('three-column')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'three-column'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                3 Column Design
+              </button>
+              <button
+                onClick={() => setActiveTab('five-column')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'five-column'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                5 Column Design
+              </button>
+              <button
+                onClick={() => setActiveTab('small-product-slider')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'small-product-slider'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Small Product Slider
+              </button>
+              <button
+                onClick={() => setActiveTab('social-network-slider')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'social-network-slider'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Social Network Slider
+              </button>
+              <button
+                onClick={() => setActiveTab('viral-slider')}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium flex-shrink-0 ${
+                  activeTab === 'viral-slider'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                Viral Slider
+              </button>
+            </nav>
+          </div>
         </div>
 
         {/* Background Config Tab */}
@@ -2847,6 +3143,697 @@ export default function ConfigEditorPage() {
                     <>
                       <Save className="w-4 h-4" />
                       Save 5 Column Design Config
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Small Product Slider Tab */}
+        {activeTab === 'small-product-slider' && (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Small Product Slider Configuration</h2>
+                <select
+                  value={selectedSmallProductSliderId}
+                  onChange={(e) => {
+                    if (e.target.value === 'new') {
+                      setSmallProductSliderConfig({
+                        id: '',
+                        headline: '',
+                        products: [],
+                        display_order: 0,
+                        is_active: true,
+                        autoplay: false,
+                        scroll_speed: 5,
+                      });
+                      setSelectedSmallProductSliderId('new');
+                    } else {
+                      const selected = smallProductSliderConfigs.find((c) => c.id === e.target.value);
+                      if (selected) {
+                        setSmallProductSliderConfig(selected);
+                        setSelectedSmallProductSliderId(selected.id);
+                      }
+                    }
+                  }}
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  {smallProductSliderConfigs.map((config) => (
+                    <option key={config.id} value={config.id}>
+                      {config.headline || `Slider ${config.display_order}`} (Order: {config.display_order})
+                    </option>
+                  ))}
+                  <option value="new">+ Create New Slider</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Basic Settings */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Settings</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                      <input
+                        type="text"
+                        value={smallProductSliderConfig.headline}
+                        onChange={(e) => setSmallProductSliderConfig((prev) => ({ ...prev, headline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Popular in clothing, shoes & accessories"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                      <input
+                        type="number"
+                        value={smallProductSliderConfig.display_order}
+                        onChange={(e) => setSmallProductSliderConfig((prev) => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="small-slider-active"
+                        checked={smallProductSliderConfig.is_active}
+                        onChange={(e) => setSmallProductSliderConfig((prev) => ({ ...prev, is_active: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="small-slider-active" className="text-sm font-medium text-gray-700">
+                        Active
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="small-slider-autoplay"
+                        checked={smallProductSliderConfig.autoplay || false}
+                        onChange={(e) => setSmallProductSliderConfig((prev) => ({ ...prev, autoplay: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="small-slider-autoplay" className="text-sm font-medium text-gray-700">
+                        Autoplay
+                      </label>
+                    </div>
+                    {smallProductSliderConfig.autoplay && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Scroll Speed (seconds)</label>
+                        <input
+                          type="number"
+                          value={smallProductSliderConfig.scroll_speed || 5}
+                          onChange={(e) => setSmallProductSliderConfig((prev) => ({ ...prev, scroll_speed: parseInt(e.target.value) || 5 }))}
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          min="1"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Products */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Products</h3>
+                    <button
+                      onClick={addSmallProductSliderProduct}
+                      className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Product
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    {smallProductSliderConfig.products.map((product, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-semibold text-gray-900">Product {index + 1}</h4>
+                          <button
+                            onClick={() => removeSmallProductSliderProduct(index)}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                            <input
+                              type="text"
+                              value={product.image_url}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'image_url', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="https://example.com/image.jpg"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                            <input
+                              type="text"
+                              value={product.title}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'title', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Product title"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                            <input
+                              type="text"
+                              value={product.price}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'price', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="$10.97"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Unit Price (optional)</label>
+                            <input
+                              type="text"
+                              value={product.unit_price || ''}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'unit_price', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="$10.97/count"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <input
+                              type="text"
+                              value={product.description || ''}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'description', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Product description"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Link</label>
+                            <input
+                              type="text"
+                              value={product.link || ''}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'link', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="/products/123"
+                            />
+                          </div>
+                          <div className="flex items-center gap-3 pt-8">
+                            <input
+                              type="checkbox"
+                              id={`product-sponsored-${index}`}
+                              checked={product.sponsored || false}
+                              onChange={(e) => updateSmallProductSliderProduct(index, 'sponsored', e.target.checked)}
+                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <label htmlFor={`product-sponsored-${index}`} className="text-sm font-medium text-gray-700">
+                              Sponsored
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {smallProductSliderConfig.products.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center py-8">No products added yet. Click "Add Product" to get started.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleSmallProductSliderSave}
+                  disabled={savingSmallProductSlider}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingSmallProductSlider ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Small Product Slider Config
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Social Network Slider Tab */}
+        {activeTab === 'social-network-slider' && (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Social Network Slider Configuration</h2>
+                <select
+                  value={selectedSocialNetworkSliderId}
+                  onChange={(e) => {
+                    if (e.target.value === 'new') {
+                      setSocialNetworkSliderConfig({
+                        id: '',
+                        headline: '',
+                        posts: [],
+                        display_order: 0,
+                        is_active: true,
+                        autoplay: false,
+                        scroll_speed: 5,
+                      });
+                      setSelectedSocialNetworkSliderId('new');
+                    } else {
+                      const selected = socialNetworkSliderConfigs.find((c) => c.id === e.target.value);
+                      if (selected) {
+                        setSocialNetworkSliderConfig(selected);
+                        setSelectedSocialNetworkSliderId(selected.id);
+                      }
+                    }
+                  }}
+                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  {socialNetworkSliderConfigs.map((config) => (
+                    <option key={config.id} value={config.id}>
+                      {config.headline || `Slider ${config.display_order}`} (Order: {config.display_order})
+                    </option>
+                  ))}
+                  <option value="new">+ Create New Slider</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Basic Settings */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Settings</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                      <input
+                        type="text"
+                        value={socialNetworkSliderConfig.headline || ''}
+                        onChange={(e) => setSocialNetworkSliderConfig((prev) => ({ ...prev, headline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Social Network Posts"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                      <input
+                        type="number"
+                        value={socialNetworkSliderConfig.display_order}
+                        onChange={(e) => setSocialNetworkSliderConfig((prev) => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="social-slider-active"
+                        checked={socialNetworkSliderConfig.is_active}
+                        onChange={(e) => setSocialNetworkSliderConfig((prev) => ({ ...prev, is_active: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="social-slider-active" className="text-sm font-medium text-gray-700">
+                        Active
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="social-slider-autoplay"
+                        checked={socialNetworkSliderConfig.autoplay || false}
+                        onChange={(e) => setSocialNetworkSliderConfig((prev) => ({ ...prev, autoplay: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="social-slider-autoplay" className="text-sm font-medium text-gray-700">
+                        Autoplay Videos
+                      </label>
+                    </div>
+                    {socialNetworkSliderConfig.autoplay && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Scroll Speed (seconds)</label>
+                        <input
+                          type="number"
+                          value={socialNetworkSliderConfig.scroll_speed || 5}
+                          onChange={(e) => setSocialNetworkSliderConfig((prev) => ({ ...prev, scroll_speed: parseInt(e.target.value) || 5 }))}
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          min="1"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Posts */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Posts</h3>
+                    <button
+                      onClick={addSocialNetworkPost}
+                      className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Post
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    {socialNetworkSliderConfig.posts.map((post, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-semibold text-gray-900">Post {index + 1}</h4>
+                          <button
+                            onClick={() => removeSocialNetworkPost(index)}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Media URL</label>
+                            <input
+                              type="text"
+                              value={post.media_url}
+                              onChange={(e) => updateSocialNetworkPost(index, 'media_url', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="https://example.com/image.jpg or video.mp4"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Media Type</label>
+                            <select
+                              value={post.media_type}
+                              onChange={(e) => updateSocialNetworkPost(index, 'media_type', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            >
+                              <option value="image">Image</option>
+                              <option value="video">Video</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Title</label>
+                            <input
+                              type="text"
+                              value={post.product_title}
+                              onChange={(e) => updateSocialNetworkPost(index, 'product_title', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Product name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Price</label>
+                            <input
+                              type="text"
+                              value={post.product_price}
+                              onChange={(e) => updateSocialNetworkPost(index, 'product_price', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="$13.98"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Link</label>
+                            <input
+                              type="text"
+                              value={post.product_link || ''}
+                              onChange={(e) => updateSocialNetworkPost(index, 'product_link', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="/products/123"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Social Handle</label>
+                            <input
+                              type="text"
+                              value={post.social_handle}
+                              onChange={(e) => updateSocialNetworkPost(index, 'social_handle', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="@username"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Caption</label>
+                            <textarea
+                              value={post.caption || ''}
+                              onChange={(e) => updateSocialNetworkPost(index, 'caption', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Post caption or description"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Tag Position X (%)</label>
+                            <input
+                              type="number"
+                              value={post.tag_position_x || 50}
+                              onChange={(e) => updateSocialNetworkPost(index, 'tag_position_x', parseFloat(e.target.value) || 50)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              min="0"
+                              max="100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Tag Position Y (%)</label>
+                            <input
+                              type="number"
+                              value={post.tag_position_y || 30}
+                              onChange={(e) => updateSocialNetworkPost(index, 'tag_position_y', parseFloat(e.target.value) || 30)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              min="0"
+                              max="100"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {socialNetworkSliderConfig.posts.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center py-8">No posts added yet. Click "Add Post" to get started.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleSocialNetworkSliderSave}
+                  disabled={savingSocialNetworkSlider}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingSocialNetworkSlider ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Social Network Slider Config
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Viral Slider Tab */}
+        {activeTab === 'viral-slider' && (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h2 className="text-xl font-semibold text-gray-900">Viral Slider Configuration</h2>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Basic Settings */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Settings</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Headline</label>
+                      <input
+                        type="text"
+                        value={viralSliderConfig.headline || ''}
+                        onChange={(e) => setViralSliderConfig((prev) => ({ ...prev, headline: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Viral Videos"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                      <input
+                        type="number"
+                        value={viralSliderConfig.display_order}
+                        onChange={(e) => setViralSliderConfig((prev) => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="viral-slider-active"
+                        checked={viralSliderConfig.is_active}
+                        onChange={(e) => setViralSliderConfig((prev) => ({ ...prev, is_active: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="viral-slider-active" className="text-sm font-medium text-gray-700">
+                        Active
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id="viral-slider-autoplay"
+                        checked={viralSliderConfig.autoplay || false}
+                        onChange={(e) => setViralSliderConfig((prev) => ({ ...prev, autoplay: e.target.checked }))}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="viral-slider-autoplay" className="text-sm font-medium text-gray-700">
+                        Autoplay Videos
+                      </label>
+                    </div>
+                    {viralSliderConfig.autoplay && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Scroll Speed (seconds)</label>
+                        <input
+                          type="number"
+                          value={viralSliderConfig.scroll_speed || 5}
+                          onChange={(e) => setViralSliderConfig((prev) => ({ ...prev, scroll_speed: parseInt(e.target.value) || 5 }))}
+                          className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          min="1"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Videos */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Videos</h3>
+                    <button
+                      onClick={addViralSliderVideo}
+                      className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Video
+                    </button>
+                  </div>
+                  <div className="space-y-4">
+                    {viralSliderConfig.videos.map((video, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-semibold text-gray-900">Video {index + 1}</h4>
+                          <button
+                            onClick={() => removeViralSliderVideo(index)}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Video URL</label>
+                            <input
+                              type="text"
+                              value={video.video_url}
+                              onChange={(e) => updateViralSliderVideo(index, 'video_url', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="TikTok, Instagram Reel, or custom video URL"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Social Handle</label>
+                            <input
+                              type="text"
+                              value={video.social_handle}
+                              onChange={(e) => updateViralSliderVideo(index, 'social_handle', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="@username"
+                            />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Caption</label>
+                            <textarea
+                              value={video.caption || ''}
+                              onChange={(e) => updateViralSliderVideo(index, 'caption', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Video caption or description"
+                              rows={2}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Title</label>
+                            <input
+                              type="text"
+                              value={video.product_title}
+                              onChange={(e) => updateViralSliderVideo(index, 'product_title', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="Product name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Price</label>
+                            <input
+                              type="text"
+                              value={video.product_price}
+                              onChange={(e) => updateViralSliderVideo(index, 'product_price', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="$14.98"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Thumbnail URL</label>
+                            <input
+                              type="text"
+                              value={video.product_thumbnail}
+                              onChange={(e) => updateViralSliderVideo(index, 'product_thumbnail', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="https://example.com/thumbnail.jpg"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Product Link</label>
+                            <input
+                              type="text"
+                              value={video.product_link || ''}
+                              onChange={(e) => updateViralSliderVideo(index, 'product_link', e.target.value)}
+                              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              placeholder="/products/123"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {viralSliderConfig.videos.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center py-8">No videos added yet. Click "Add Video" to get started.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={handleViralSliderSave}
+                  disabled={savingViralSlider}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingViralSlider ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Viral Slider Config
                     </>
                   )}
                 </button>
