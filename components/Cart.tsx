@@ -17,7 +17,7 @@ export default function Cart() {
           <div className="inline-block p-6 bg-gray-100 rounded-full mb-6">
             <ShoppingCart className="w-16 h-16 text-gray-400" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
             Your Cart is Empty
           </h1>
           <p className="text-lg text-gray-600 mb-8">Start adding some products to your cart!</p>
@@ -36,7 +36,7 @@ export default function Cart() {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-32 pb-12 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-playfair)' }}>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-roboto)' }}>
           Shopping Cart
         </h1>
         <p className="text-gray-600">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart</p>

@@ -114,7 +114,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50 pt-32 pb-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-playfair)' }}>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'var(--font-roboto)' }}>
             My Profile
           </h1>
           <p className="text-gray-600">Manage your account and view order history</p>

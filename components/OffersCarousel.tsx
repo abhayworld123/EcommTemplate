@@ -70,7 +70,7 @@ export default function OffersCarousel() {
 
   return (
     <div
-      className="relative w-full overflow-hidden py-12 md:py-16"
+      className="relative w-full overflow-hidden pt-6 md:pt-8 pb-2 md:pb-3"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -98,7 +98,7 @@ export default function OffersCarousel() {
                       </span>
                     </div>
                   )}
-                  <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-playfair)' }}>
+                  <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-roboto)' }}>
                     {currentOffer.title}
                   </h2>
                   <p className="text-lg md:text-xl text-white/90 mb-8 max-w-md">

@@ -45,12 +45,46 @@ export interface SiteConfig {
   contact_email?: string;
   contact_phone?: string;
   contact_address?: string;
+  home_layout?: string[];
   social_media?: {
     facebook?: string;
     twitter?: string;
     instagram?: string;
     linkedin?: string;
   };
+}
+
+export interface SliderConfig {
+  id: string;
+  images: string[];
+  autoplay: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface NavigationItem {
+  label: string;
+  href: string;
+}
+
+export interface HeaderConfig {
+  id: string;
+  style: 'default' | 'centered' | 'minimal' | 'modern' | 'classic';
+  background_color: string;
+  text_color: string;
+  hover_color: string;
+  accent_color: string;
+  logo_url?: string;
+  logo_text?: string;
+  sticky: boolean;
+  transparent_on_top: boolean;
+  navigation_items: NavigationItem[];
+  show_search: boolean;
+  show_cart: boolean;
+  show_user_menu: boolean;
+  height: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ExcelProductRow {
@@ -83,5 +117,160 @@ export interface User {
   id: string;
   email: string;
   created_at?: string;
+}
+
+export interface ProductSliderConfig {
+  id: string;
+  title: string;
+  type: 'all' | 'category' | 'featured' | 'newest';
+  category?: string;
+  limit_count: number;
+  display_order: number;
+  show_title: boolean;
+  auto_scroll: boolean;
+  scroll_speed: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface BackgroundConfig {
+  id: string;
+  type: 'gradient' | 'mesh' | 'particles' | 'grid';
+  primary_color: string;
+  secondary_color: string;
+  tertiary_color: string;
+  speed: number;
+  direction: string;
+  opacity: number;
+  blur: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ThreeColumnItem {
+  image_url: string;
+  title: string;
+  description?: string;
+  link: string;
+  discount_text?: string;
+}
+
+export interface ThreeColumnDesignConfig {
+  id: string;
+  column1_title: string;
+  column1_items: ThreeColumnItem[];
+  column2_title: string;
+  column2_items: ThreeColumnItem[];
+  column3_headline: string;
+  column3_subheadline?: string;
+  column3_cta_text: string;
+  column3_cta_link: string;
+  column3_image_url?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FiveColumnDesignConfig {
+  id: string;
+  column1_headline: string;
+  column1_subheadline?: string;
+  column1_cta_text: string;
+  column1_cta_link: string;
+  column1_image_url?: string;
+  column2_title: string;
+  column2_cta_text: string;
+  column2_cta_link: string;
+  column2_image_url?: string;
+  column3_title: string;
+  column3_price_text?: string;
+  column3_cta_text: string;
+  column3_cta_link: string;
+  column3_image_url?: string;
+  column4_title: string;
+  column4_price_text?: string;
+  column4_cta_text: string;
+  column4_cta_link: string;
+  column4_image_url?: string;
+  column5_title: string;
+  column5_price_text?: string;
+  column5_cta_text: string;
+  column5_cta_link: string;
+  column5_image_url?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SmallProductSliderItem {
+  image_url: string;
+  title: string;
+  price: string;
+  unit_price?: string;
+  description?: string;
+  link?: string;
+  sponsored?: boolean;
+}
+
+export interface SmallProductSliderConfig {
+  id: string;
+  headline: string;
+  products: SmallProductSliderItem[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SocialNetworkPost {
+  media_url: string;
+  media_type: 'image' | 'video';
+  product_title: string;
+  product_price: string;
+  product_link?: string;
+  social_handle: string;
+  caption?: string;
+  tag_position_x?: number;
+  tag_position_y?: number;
+}
+
+export interface SocialNetworkSliderConfig {
+  id: string;
+  headline?: string;
+  posts: SocialNetworkPost[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ViralSliderVideo {
+  video_url: string;
+  social_handle: string;
+  caption?: string;
+  product_title: string;
+  product_price: string;
+  product_thumbnail: string;
+  product_link?: string;
+}
+
+export interface ViralSliderConfig {
+  id: string;
+  headline?: string;
+  videos: ViralSliderVideo[];
+  display_order: number;
+  is_active: boolean;
+  autoplay?: boolean;
+  scroll_speed?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
